@@ -16,3 +16,7 @@ def check_compliance(metrics: dict) -> dict:
     return {
         "violations": violations
     }
+
+
+def get_violations(metrics: dict) -> dict:
+    return check_compliance(metrics)

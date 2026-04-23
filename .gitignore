@@ -25,3 +25,9 @@ Thumbs.db
 
 # Local data and logs (keep dataset folder if needed)
 *.log
+
+# FairLens cache artifacts
+data/cached_*.json
+
+# Optional: ignore local datasets
+data/*.csv

@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from fairlearn.metrics import demographic_parity_difference, equalized_odds_difference
 from sklearn.metrics import precision_score
-from modules.attribute_detector import detect_attributes
+from app.modules.attribute_detector import detect_attributes
 
 def audit(df: pd.DataFrame) -> dict:
     protected_cols = detect_attributes(df)

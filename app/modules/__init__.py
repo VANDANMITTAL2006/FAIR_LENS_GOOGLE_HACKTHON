@@ -1,0 +1,1 @@
+from app.modules.attribute_detector import detect_attributes

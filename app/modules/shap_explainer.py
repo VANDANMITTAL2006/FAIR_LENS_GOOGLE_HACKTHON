@@ -9,7 +9,7 @@ def explain(df: pd.DataFrame) -> dict:
     # Use max 1000 rows to guarantee fast execution (< 10s)
     sample_df = df.sample(min(len(df), 1000), random_state=42) if len(df) > 1000 else df
     
-    from modules.attribute_detector import detect_attributes
+    from app.modules.attribute_detector import detect_attributes
     protected = detect_attributes(sample_df)
     
     numeric_df = sample_df.select_dtypes(include=[np.number])

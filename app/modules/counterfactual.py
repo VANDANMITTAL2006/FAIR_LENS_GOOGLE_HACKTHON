@@ -33,3 +33,11 @@ def run_counterfactual(sample: dict) -> dict:
         "after_race_swap": max(0, min(100, after_race_swap)),
         "delta": delta_str
     }
+
+
+def get_counterfactual(df) -> dict:
+    if hasattr(df, "iloc") and len(df) > 0:
+        sample = df.iloc[0].to_dict()
+    else:
+        sample = {}
+    return run_counterfactual(sample)

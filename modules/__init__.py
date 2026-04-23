@@ -1,1 +1,0 @@
-from backend.app.services.attribute_detector import detect_attributes
