@@ -1,0 +1,142 @@
+{
+  "dataset": "COMPAS Recidivism (Criminal Justice)",
+  "label_col": "two_year_recid",
+  "protected_col": "is_african_american",
+  "privileged_group": "0",
+  "n_rows": 7214,
+  "strategies": {
+    "reweighting": {
+      "strategy": "Reweighting",
+      "description": "Assigns higher training weights to under-represented groups, forcing the model to treat all demographics equally during learning.",
+      "how_it_works_simple": "Imagine a classroom where some students are ignored. Reweighting makes the teacher pay MORE attention to those ignored students during training.",
+      "accuracy_before": 0.5801,
+      "accuracy_after": 0.5704,
+      "accuracy_loss_pct": 0.97,
+      "fairness_before": {
+        "demographic_parity_diff": 0.216,
+        "disparate_impact": 0.467,
+        "group_positive_rates": {
+          "0": 0.1893,
+          "1": 0.4053
+        },
+        "gap_percentage_points": 21.6
+      },
+      "fairness_after": {
+        "demographic_parity_diff": 0.0005,
+        "disparate_impact": 0.9984,
+        "group_positive_rates": {
+          "0": 0.2806,
+          "1": 0.2801
+        },
+        "gap_percentage_points": 0.05
+      },
+      "fairness_improvement_pct": 21.55,
+      "disparate_impact_gain": 0.5314,
+      "eeoc_compliant_after": true,
+      "recommended": true,
+      "tradeoff_summary": "Bias gap reduced by 21.55% pts. Accuracy loss: 0.97% pts."
+    },
+    "threshold_adjustment": {
+      "strategy": "Threshold Adjustment",
+      "description": "Trains one model but applies different decision thresholds per demographic group, equalising the rate of positive predictions across groups.",
+      "how_it_works_simple": "Like a grading curve \u2014 instead of everyone needing 60% to pass, the teacher adjusts the passing score per group so outcomes are equal.",
+      "accuracy_before": 0.5801,
+      "accuracy_after": 0.5672,
+      "accuracy_loss_pct": 1.29,
+      "group_thresholds": {
+        "0": 0.4324,
+        "1": 0.4872
+      },
+      "fairness_before": {
+        "demographic_parity_diff": 0.216,
+        "disparate_impact": 0.467,
+        "group_positive_rates": {
+          "0": 0.1893,
+          "1": 0.4053
+        },
+        "gap_percentage_points": 21.6
+      },
+      "fairness_after": {
+        "demographic_parity_diff": 0.0007,
+        "disparate_impact": 0.9984,
+        "group_positive_rates": {
+          "0": 0.468,
+          "1": 0.4687
+        },
+        "gap_percentage_points": 0.07
+      },
+      "fairness_improvement_pct": 21.53,
+      "disparate_impact_gain": 0.5314,
+      "eeoc_compliant_after": true,
+      "recommended": true,
+      "tradeoff_summary": "Bias gap reduced by 21.53% pts. Accuracy loss: 1.29% pts."
+    },
+    "feature_removal": {
+      "strategy": "Feature Removal",
+      "description": "Identifies and removes features that are highly correlated with the protected attribute (proxy features), then retrains the model without them.",
+      "how_it_works_simple": "If your model uses 'zipcode' and zipcode is 80% correlated with race, it's sneakily using race. We remove zipcode and all similar hidden proxies.",
+      "accuracy_before": 0.5801,
+      "accuracy_after": 0.5815,
+      "accuracy_loss_pct": -0.14,
+      "proxy_features_removed": [
+        "decile_score",
+        "is_caucasian",
+        "high_risk",
+        "is_african_american"
+      ],
+      "features_kept": [
+        "id",
+        "age",
+        "juv_fel_count",
+        "juv_misd_count",
+        "juv_other_count",
+        "priors_count",
+        "days_b_screening_arrest",
+        "c_days_from_compas",
+        "two_year_violent_recid",
+        "sex_binary",
+        "charge_degree_binary",
+        "age_cat_encoded"
+      ],
+      "proxy_correlation_scores": {
+        "is_caucasian": 0.736,
+        "decile_score": 0.3136,
+        "high_risk": 0.2248,
+        "priors_count": 0.1721,
+        "age_cat_encoded": 0.0253,
+        "juv_other_count": 0.0249,
+        "age": 0.0154,
+        "two_year_violent_recid": 0.0122,
+        "charge_degree_binary": 0.0108,
+        "juv_misd_count": 0.0094
+      },
+      "correlation_threshold": 0.2,
+      "features_removed_count": 4,
+      "fairness_before": {
+        "demographic_parity_diff": 0.216,
+        "disparate_impact": 0.467,
+        "group_positive_rates": {
+          "0": 0.1893,
+          "1": 0.4053
+        },
+        "gap_percentage_points": 21.6
+      },
+      "fairness_after": {
+        "demographic_parity_diff": 0.0769,
+        "disparate_impact": 0.7645,
+        "group_positive_rates": {
+          "0": 0.2495,
+          "1": 0.3264
+        },
+        "gap_percentage_points": 7.69
+      },
+      "fairness_improvement_pct": 13.91,
+      "disparate_impact_gain": 0.2975,
+      "eeoc_compliant_after": false,
+      "recommended": true,
+      "tradeoff_summary": "4 proxy features removed. Bias gap reduced by 13.91% pts. Accuracy loss: -0.14% pts."
+    }
+  },
+  "recommended_strategy": "reweighting",
+  "summary": "Ran 3 debiasing strategies on COMPAS Recidivism (Criminal Justice). Best recommended: reweighting. All results ready for frontend."
+}
