@@ -17,6 +17,12 @@ app.include_router(upload.router)
 app.include_router(audit.router)
 
 
+from fastapi.responses import RedirectResponse
+
+@app.get("/")
+def read_root():
+    return RedirectResponse(url="/docs")
+
 @app.get("/health")
 def health():
     return {"status": "ok"}
