@@ -1,72 +1,56 @@
-# FAIR LENS Backend
+# FAIR LENS
 
-FastAPI backend for FAIR LENS (Google Hackathon) to support bias-aware hiring pipeline workflows.
+FAIR LENS is a monorepo for a bias-aware hiring fairness demo with a FastAPI backend and a Vite frontend.
 
-## What You Built
+## Repository Layout
 
-You implemented a backend service with:
+- `backend/` contains the FastAPI application, services, and Pydantic models.
+- `frontend/` contains the React UI.
+- `docs/` contains the architecture, API, problem statement, and metric contract documentation.
 
-- A FastAPI application entry point with CORS enabled for frontend integration.
-- A CSV upload endpoint that reads candidate data and detects protected attributes.
-- A fairness audit endpoint with a fixed response contract (currently stubbed metrics for integration).
-- A health check endpoint for uptime verification.
+## Backend Overview
 
-## Project Structure
+The backend is organized as:
 
-- `main.py` initializes FastAPI, middleware, and routers.
-- `routers/upload.py` handles file upload and schema/attribute discovery.
-- `modules/attribute_detector.py` contains protected-attribute detection logic.
-- `routers/audit.py` returns audit metrics in a stable response shape.
-- `requirements.txt` lists Python dependencies.
+- `backend/app/api/` for HTTP routes
+- `backend/app/core/` for config and settings
+- `backend/app/services/` for business logic
+- `backend/app/models/` for Pydantic schemas
+- `backend/app/utils/` for helpers
+- `backend/app/main.py` for the FastAPI app entrypoint
 
-## API Endpoints
+## What It Does
 
-### GET `/health`
-Returns service status.
+- Accepts CSV and JSON uploads and converts them into pandas DataFrames.
+- Detects protected or proxy-sensitive attributes such as age, gender, race, and zipcode.
+- Returns a stable fairness audit JSON contract for the frontend dashboard.
+- Exposes a health endpoint for uptime checks.
 
-Example response:
-```json
-{"status": "ok"}
-```
+## Run the Backend
 
-### POST `/upload`
-Accepts a CSV file and returns:
-- Total rows
-- Column list
-- Detected protected attributes
-- Original filename
-
-### POST `/audit`
-Returns fairness/bias metrics and model governance-style outputs (stubbed for now):
-- Disparate impact
-- Statistical parity difference
-- Equalized odds difference
-- Predictive parity difference
-- Group-level selection metrics
-- EEOC threshold breach flag
-- Top contributing features
-- Regulatory violation list
-
-## Setup and Run
-
-1. Create and activate a Python virtual environment.
-2. Install dependencies:
+From the repository root:
 
 ```bash
-pip install -r requirements.txt
+pip install -r backend/requirements.txt
+uvicorn backend.app.main:app --host 127.0.0.1 --port 8000
 ```
 
-3. Start the server:
+## Run the Frontend
 
 ```bash
-uvicorn main:app --host 127.0.0.1 --port 8000
+cd frontend
+npm install
+npm run dev
 ```
 
-4. Open docs:
-- Swagger UI: `http://127.0.0.1:8000/docs`
-- Health check: `http://127.0.0.1:8000/health`
+## Documentation
+
+- [Architecture](docs/architecture.md)
+- [API Spec](docs/api-spec.md)
+- [Problem Statement](docs/problem-statement.md)
+- [Metric Schema Contract](docs/metric_schema_contract.md)
 
 ## Notes
 
-- Current audit values are placeholder outputs designed for frontend and integration testing.
-- The next step is to replace the audit stub with real fairness metric computation over model predictions and sensitive groups.
+- The audit endpoint currently returns stubbed metrics with a fixed response shape.
+- The current folder layout now matches the requested `backend/app` structure.

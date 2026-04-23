@@ -7,7 +7,7 @@ KNOWN_PROTECTED = [
     "zipcode",
     "zip_code",
     "nationality",
-    "marital_status"
+    "marital_status",
 ]
 
 

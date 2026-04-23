@@ -8,8 +8,12 @@ __pycache__/
 
 # Virtual environments
 .venv/
+backend/.venv/
 venv/
 env/
+
+# Node
+frontend/node_modules/
 
 # IDE/editor
 .vscode/
