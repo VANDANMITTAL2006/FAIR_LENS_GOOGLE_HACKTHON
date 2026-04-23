@@ -9,21 +9,19 @@ const DebiasSection = ({
   hasFile,
 }) => {
   const getRecommendedStrategy = () => {
-    if (!hasFile) return null;
+  if (!hasFile) return null;
 
-    const genderGap = metrics.find((m) => m.id === 'gender')?.value;
-    const raceGap = metrics.find((m) => m.id === 'race')?.value;
-    const fairness = metrics.find((m) => m.id === 'fairness')?.value;
+  const genderGap = Number(metrics.find((m) => m.id === "gender")?.value || 0);
+  const raceGap = Number(metrics.find((m) => m.id === "race")?.value || 0);
+  const fairness = Number(
+    String(metrics.find((m) => m.id === "fairness")?.value || "0").split("/")[0]
+  );
 
-    const genderVal = parseInt(genderGap || '0');
-    const raceVal = parseInt(raceGap || '0');
-    const fairnessVal = parseInt((fairness || '0').split('/')[0]);
-
-    if (genderVal > 20 || raceVal > 20) return 'reweighting';
-    if (fairnessVal < 70) return 'thresholds';
-
-    return 'feature-removal';
-  };
+  const maxGap = Math.max(genderGap, raceGap);
+if (genderGap >= 10 || raceGap >= 10) return "reweighting";
+if (fairness < 70) return "thresholds";
+return "feature-removal";
+};
 
   const recommended = getRecommendedStrategy();
 

@@ -9,14 +9,31 @@ import {
   Search,
 } from 'lucide-react';
 
-const navItems = ['Dashboard', 'Models', 'Reports', 'Datasets'];
+const navItems = [
+  { label: 'Dashboard', id: 'dashboard' },
+  { label: 'Models', id: 'models' },
+  { label: 'Reports', id: 'reports' },
+  { label: 'Datasets', id: 'datasets' },
+];
 
 const Navbar = ({ onLoadDemo, onExport }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  const scrollToSection = (id) => {
+    const section = document.getElementById(id);
+    if (section) {
+      section.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }
+    setIsMenuOpen(false);
+  };
+
   return (
-    <nav className="sticky top-0 z-50 border-b border-slate-800 bg-[#07111f]/95 backdrop-blur-xl">
+    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-slate-800 bg-[#07111f]/95 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+
         {/* Left */}
         <div className="flex items-center gap-10">
           <div className="flex items-center gap-3">
@@ -34,17 +51,19 @@ const Navbar = ({ onLoadDemo, onExport }) => {
             </div>
           </div>
 
+          {/* Desktop Nav */}
           <div className="hidden lg:flex items-center gap-8">
             {navItems.map((item, index) => (
               <button
-                key={item}
+                key={item.label}
+                onClick={() => scrollToSection(item.id)}
                 className={`text-sm font-medium transition ${
                   index === 0
                     ? 'text-white border-b-2 border-white pb-1'
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
-                {item}
+                {item.label}
               </button>
             ))}
           </div>
@@ -83,7 +102,7 @@ const Navbar = ({ onLoadDemo, onExport }) => {
             Export
           </button>
 
-          <div className="h-10 w-10 rounded-full border border-slate-700 bg-[url('https://i.pravatar.cc/100')] bg-cover bg-center" />
+          <div className="h-10 w-10 rounded-full border border-slate-700 bg-slate-600" />
         </div>
 
         {/* Mobile */}
@@ -95,14 +114,16 @@ const Navbar = ({ onLoadDemo, onExport }) => {
         </button>
       </div>
 
+      {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="border-t border-slate-800 bg-[#07111f] px-4 py-4 md:hidden space-y-3">
           {navItems.map((item) => (
             <button
-              key={item}
+              key={item.label}
+              onClick={() => scrollToSection(item.id)}
               className="block w-full rounded-lg bg-slate-900 px-4 py-3 text-left text-sm text-slate-200"
             >
-              {item}
+              {item.label}
             </button>
           ))}
 
