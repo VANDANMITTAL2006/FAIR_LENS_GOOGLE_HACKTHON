@@ -30,17 +30,40 @@ def _encode_for_model(df: pd.DataFrame, target_col: str) -> tuple[pd.DataFrame, 
     return X, y
 
 
+def _binarize(series: pd.Series) -> pd.Series:
+    """Map any numeric label column to {0, 1}.
+
+    Rules (applied in order):
+      1. Already {0, 1}  → return as-is
+      2. {-1, 1}         → map -1→0
+      3. {1, 2}          → map 2→0 (COMPAS-style: 1=recid, 2=no recid)
+      4. Any other        → median-split (>= median → 1, else 0)
+    """
+    vals = set(series.dropna().unique())
+    if vals <= {0, 1}:
+        return series
+    if vals <= {-1, 1}:
+        return series.map({-1: 0, 1: 1})
+    if vals <= {1, 2}:
+        return series.map({1: 1, 2: 0})
+    # General fallback: binarize by median
+    median = series.median()
+    return (series >= median).astype(int)
+
+
 def _resolve_y_true(df: pd.DataFrame) -> pd.Series:
     for candidate in ["y_true", "outcome", "label", "target", "income_binary", "two_year_recid", "action_taken"]:
         if candidate in df.columns:
-            return pd.to_numeric(df[candidate], errors="coerce")
+            raw = pd.to_numeric(df[candidate], errors="coerce")
+            return _binarize(raw)
     raise ValueError("cannot compute fairness metrics: missing y_true/outcome label column")
 
 
 def _resolve_y_pred(df: pd.DataFrame, y_true: pd.Series) -> pd.Series:
     for candidate in ["y_pred", "prediction", "pred", "predicted_label"]:
         if candidate in df.columns:
-            return pd.to_numeric(df[candidate], errors="coerce")
+            raw = pd.to_numeric(df[candidate], errors="coerce")
+            return _binarize(raw)
 
     target_col = y_true.name or "y_true"
     if target_col not in df.columns:
@@ -107,8 +130,8 @@ def audit(df: pd.DataFrame) -> dict:
                 "protected_attributes": protected_cols
             }
 
-        y_true = aligned["y_true"].astype(int)
-        y_pred = aligned["y_pred"].astype(int)
+        y_true = _binarize(aligned["y_true"]).astype(int)
+        y_pred = _binarize(aligned["y_pred"]).astype(int)
 
         metrics = {
             "demographic_parity_difference": 0.0,
@@ -146,7 +169,7 @@ def audit(df: pd.DataFrame) -> dict:
                 group_metrics[g] = {"selection_rate": round(sr, 4), "sample_size": size}
 
                 if y_pred[mask].sum() > 0:
-                    precisions.append(precision_score(y_true[mask], y_pred[mask], zero_division=0))
+                    precisions.append(precision_score(y_true[mask], y_pred[mask], pos_label=1, zero_division=0))
 
         if rates:
             max_rate = max(rates.values())

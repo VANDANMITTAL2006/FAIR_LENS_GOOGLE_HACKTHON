@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FairLens | Name-Swap Demo</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed": "#211a15",
+                        "primary": "#ffffff",
+                        "surface": "#131313",
+                        "on-secondary-fixed-variant": "#404752",
+                        "outline-variant": "#44474a",
+                        "surface-tint": "#c4c7ca",
+                        "tertiary-fixed": "#ede0d6",
+                        "on-primary-container": "#626568",
+                        "on-secondary": "#2a313b",
+                        "tertiary-fixed-dim": "#d0c4bb",
+                        "secondary-container": "#404752",
+                        "on-error-container": "#ffdad6",
+                        "surface-container": "#201f20",
+                        "secondary": "#c0c7d3",
+                        "on-primary-fixed": "#191c1f",
+                        "tertiary-container": "#ede0d6",
+                        "on-primary": "#2d3134",
+                        "on-background": "#e5e2e1",
+                        "primary-fixed": "#e0e2e6",
+                        "outline": "#8f9194",
+                        "surface-container-high": "#2a2a2a",
+                        "error": "#ffb4ab",
+                        "tertiary": "#ffffff",
+                        "surface-container-low": "#1c1b1c",
+                        "surface-container-lowest": "#0e0e0e",
+                        "secondary-fixed-dim": "#c0c7d3",
+                        "on-error": "#690005",
+                        "error-container": "#93000a",
+                        "inverse-primary": "#5c5f62",
+                        "primary-container": "#e0e2e6",
+                        "primary-fixed-dim": "#c4c7ca",
+                        "on-tertiary-container": "#6c635b",
+                        "on-surface": "#e5e2e1",
+                        "on-tertiary-fixed-variant": "#4d453e",
+                        "on-surface-variant": "#c5c6ca",
+                        "inverse-surface": "#e5e2e1",
+                        "inverse-on-surface": "#313030",
+                        "surface-bright": "#3a3939",
+                        "on-secondary-fixed": "#151c25",
+                        "secondary-fixed": "#dce3f0",
+                        "background": "#131313",
+                        "on-tertiary": "#362f29",
+                        "surface-dim": "#131313",
+                        "on-primary-fixed-variant": "#44474a",
+                        "on-secondary-container": "#afb5c2",
+                        "surface-variant": "#353435",
+                        "surface-container-highest": "#353435"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin": "32px",
+                        "sm": "8px",
+                        "2xl": "64px",
+                        "gutter": "24px",
+                        "lg": "24px",
+                        "unit": "4px",
+                        "xs": "4px",
+                        "md": "16px",
+                        "xl": "40px"
+                    },
+                    "fontFamily": {
+                        "display-xl": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "title-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "label-caps": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-xl": ["60px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "display-lg": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "title-sm": ["20px", {"lineHeight": "1.4", "letterSpacing": "0", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}],
+                        "headline-md": ["30px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "label-caps": ["12px", {"lineHeight": "1.0", "letterSpacing": "0.05em", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-card {
+            background: rgba(17, 24, 39, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .bias-glow-red {
+            text-shadow: 0 0 20px rgba(147, 0, 10, 0.6);
+        }
+        .particle-bg {
+            background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0);
+            background-size: 24px 24px;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md particle-bg min-h-screen">
+<!-- TopNavBar (Shared Component) -->
+<nav class="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-8 h-16 bg-[#111827]/80 backdrop-blur-md border-b border-white/10 shadow-2xl shadow-black/40">
+<div class="text-xl font-bold tracking-tighter text-[#E5E7EB]">FairLens</div>
+<div class="hidden md:flex space-x-8 font-inter tracking-tight font-medium">
+<a class="text-slate-400 hover:text-slate-200 transition-all duration-200" href="#">Dashboard</a>
+<a class="text-[#E5E7EB] border-b-2 border-[#E5E7EB] pb-1 transition-all duration-200" href="#">Models</a>
+<a class="text-slate-400 hover:text-slate-200 transition-all duration-200" href="#">Reports</a>
+<a class="text-slate-400 hover:text-slate-200 transition-all duration-200" href="#">Datasets</a>
+</div>
+<div class="flex items-center space-x-4">
+<span class="material-symbols-outlined text-[#E5E7EB] cursor-pointer hover:bg-white/5 p-2 rounded-full transition-all">notifications</span>
+<span class="material-symbols-outlined text-[#E5E7EB] cursor-pointer hover:bg-white/5 p-2 rounded-full transition-all">settings</span>
+<img alt="Analyst profile" class="w-8 h-8 rounded-full border border-white/20" data-alt="Close up of a professional analyst in a dark tech environment, soft blue lighting on face" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpL0u2mqJlTFH9qGjNdkAkBwnXAas5YoTQHDXnGklcWxiCbhsO2PWl_8jAjZEiERq5iwTB9hXRl7nUnTajs6E8ekeExHW2yJuXXXskB-QOZic89AopxR-ahSQuQz9IvrLe27WL3cDSjEQ4XUb2zSOrlBJcleIx2U9I7XsSPq1tP95c91zbS-Rk3bIOUJdUnNckATVLqMx17D_hTsHkpdx--a3Ye38b5gyyvwjBtxr2byS2g9QGBHQ_tdMvR3oApEQbZDhvxXT6iWA"/>
+</div>
+</nav>
+<!-- SideNavBar (Shared Component) -->
+<aside class="fixed left-0 top-0 h-full w-64 border-r border-white/10 bg-[#0B0F14]/95 backdrop-blur-2xl shadow-[20px_0px_40px_rgba(0,0,0,0.5)] z-40 hidden lg:flex flex-col p-4 pt-24 space-y-4">
+<div class="px-4 mb-6">
+<div class="flex items-center space-x-3 mb-2">
+<div class="w-8 h-8 bg-primary rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-background text-sm" style="font-variation-settings: 'FILL' 1;">hub</span>
+</div>
+<div>
+<h3 class="text-lg font-black text-[#E5E7EB] leading-tight">Enterprise Mode</h3>
+<p class="text-[10px] uppercase tracking-widest text-slate-500">Algorithm Audit</p>
+</div>
+</div>
+</div>
+<div class="space-y-1">
+<a class="flex items-center space-x-3 p-3 text-slate-500 hover:text-slate-300 hover:bg-white/5 rounded-lg transition-colors duration-300" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-inter text-sm antialiased">Overview</span>
+</a>
+<a class="flex items-center space-x-3 p-3 bg-white/10 text-white rounded-lg shadow-[0_0_15px_rgba(255,255,255,0.05)] transition-transform active:translate-x-1" href="#">
+<span class="material-symbols-outlined">query_stats</span>
+<span class="font-inter text-sm antialiased">Bias Detection</span>
+</a>
+<a class="flex items-center space-x-3 p-3 text-slate-500 hover:text-slate-300 hover:bg-white/5 rounded-lg transition-colors duration-300" href="#">
+<span class="material-symbols-outlined">balance</span>
+<span class="font-inter text-sm antialiased">Fairness Metrics</span>
+</a>
+<a class="flex items-center space-x-3 p-3 text-slate-500 hover:text-slate-300 hover:bg-white/5 rounded-lg transition-colors duration-300" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="font-inter text-sm antialiased">Audit Logs</span>
+</a>
+<a class="flex items-center space-x-3 p-3 text-slate-500 hover:text-slate-300 hover:bg-white/5 rounded-lg transition-colors duration-300" href="#">
+<span class="material-symbols-outlined">hub</span>
+<span class="font-inter text-sm antialiased">Enterprise API</span>
+</a>
+</div>
+<div class="mt-auto pt-6 border-t border-white/10 space-y-1">
+<button class="w-full mb-4 py-2.5 bg-primary text-background font-bold rounded-lg text-sm transition-all hover:opacity-90 active:scale-95">Run New Audit</button>
+<a class="flex items-center space-x-3 p-2 text-slate-500 hover:text-slate-300" href="#">
+<span class="material-symbols-outlined text-sm">help</span>
+<span class="font-inter text-sm">Support</span>
+</a>
+<a class="flex items-center space-x-3 p-2 text-slate-500 hover:text-slate-300" href="#">
+<span class="material-symbols-outlined text-sm">description</span>
+<span class="font-inter text-sm">Documentation</span>
+</a>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="lg:ml-64 pt-24 px-margin pb-2xl min-h-screen">
+<div class="max-w-4xl mx-auto">
+<!-- Header Section -->
+<div class="mb-xl">
+<span class="bg-error-container/20 text-error px-3 py-1 rounded-full text-label-caps uppercase font-bold border border-error/30 inline-block mb-md">Interactive Stress Test</span>
+<h1 class="font-display-lg text-display-lg text-primary mb-sm">The Proxy Bias Lab</h1>
+<p class="text-on-surface-variant font-body-lg max-w-2xl">Observe how the algorithm reacts to identity manipulation. This test isolates "Name" as a proxy variable for demographic bias.</p>
+</div>
+<!-- Name-Swap Demo Container -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-lg items-start">
+<!-- Left: Candidate Card (The "Before" State) -->
+<div class="md:col-span-7 glass-card rounded-xl overflow-hidden shadow-2xl relative">
+<!-- Subtle Glow Effect in Corner -->
+<div class="absolute -top-24 -right-24 w-48 h-48 bg-error/10 blur-[80px] rounded-full"></div>
+<div class="p-lg flex items-start justify-between border-b border-white/5">
+<div class="flex items-center space-x-md">
+<div class="relative">
+<img alt="Sarah Chen" class="w-20 h-20 rounded-xl object-cover border border-white/10" data-alt="Professional headshot of a young woman of Asian descent, intelligent expression, minimalist office background, high-end photography" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCBrpRDivBNdnWhONr9sl4N7FBU89fK0AX911sACx_nFwAnDgUktaXayUJtZoFtl-rs5MGJ7JmEN9mrFZOhVjUXreOoquiNjyo_Z2RkWBN6OBykCBKQo1Dd1GTq98NTQYMlaY2lp0b6ldU1pl5D_q6L2OclYUa1obiZV2FXIDbuJ8_ZoL4skfoJms-yCd_e-MnlD7dXQh7oDApi2EkH6QhVnJk6reWDZXjTA1IWKdZdhobHNHazm6jL43J0EIMStnwVJrU81_60wk0"/>
+<div class="absolute -bottom-2 -right-2 bg-error rounded-full p-1 border-2 border-[#111827]">
+<span class="material-symbols-outlined text-xs text-on-error" style="font-variation-settings: 'FILL' 1;">warning</span>
+</div>
+</div>
+<div>
+<h2 class="text-headline-md font-headline-md text-primary">Sarah Chen</h2>
+<p class="text-on-surface-variant font-body-md">Senior Software Engineer</p>
+<div class="flex items-center space-x-sm mt-xs">
+<span class="bg-surface-variant text-on-surface-variant px-2 py-0.5 rounded text-[10px] font-bold uppercase">MIT Alumni</span>
+<span class="bg-surface-variant text-on-surface-variant px-2 py-0.5 rounded text-[10px] font-bold uppercase">5 YRS EXP</span>
+</div>
+</div>
+</div>
+<div class="text-right">
+<p class="text-label-caps text-on-surface-variant mb-1 uppercase tracking-widest">Fairness Score</p>
+<div class="text-display-lg font-display-xl text-error bias-glow-red leading-none">34%</div>
+<p class="text-[10px] text-error font-bold mt-2 uppercase">Critical Bias Alert</p>
+</div>
+</div>
+<div class="p-lg space-y-md">
+<div class="grid grid-cols-2 gap-md">
+<div class="bg-surface-container rounded-lg p-md border border-white/5">
+<p class="text-label-caps text-slate-500 mb-1 uppercase">Education Quality</p>
+<div class="w-full bg-white/5 h-1.5 rounded-full overflow-hidden mt-2">
+<div class="bg-primary h-full w-[94%]"></div>
+</div>
+<p class="text-[11px] text-primary mt-2">Tier 1: Global Ranking</p>
+</div>
+<div class="bg-surface-container rounded-lg p-md border border-white/5">
+<p class="text-label-caps text-slate-500 mb-1 uppercase">Technical Proficiency</p>
+<div class="w-full bg-white/5 h-1.5 rounded-full overflow-hidden mt-2">
+<div class="bg-primary h-full w-[88%]"></div>
+</div>
+<p class="text-[11px] text-primary mt-2">98th Percentile Code Review</p>
+</div>
+</div>
+<div class="bg-error-container/5 rounded-lg p-md border border-error/10">
+<div class="flex items-center space-x-sm mb-sm">
+<span class="material-symbols-outlined text-error text-sm">info</span>
+<p class="text-xs font-bold text-error uppercase">Bias Analysis Root Cause</p>
+</div>
+<p class="text-sm text-on-surface-variant italic">"High penalty detected on demographic proxy clusters. Neutral skills are being suppressed by historically biased name-association datasets."</p>
+</div>
+</div>
+</div>
+<!-- Right: Interaction Panel -->
+<div class="md:col-span-5 space-y-lg">
+<div class="glass-card rounded-xl p-lg border-white/10 shadow-xl">
+<h3 class="text-title-sm font-title-sm text-primary mb-md">Identity Swap Module</h3>
+<div class="space-y-md">
+<div>
+<label class="block text-label-caps text-slate-500 mb-sm uppercase tracking-wider">Active Name</label>
+<div class="relative">
+<input class="w-full bg-surface-container-lowest border border-white/20 rounded-lg py-3 px-4 text-primary font-medium focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all" readonly="" type="text" value="Sarah Chen"/>
+<div class="absolute right-3 top-3">
+<span class="material-symbols-outlined text-slate-500 text-sm">lock</span>
+</div>
+</div>
+</div>
+<div class="flex justify-center py-2">
+<div class="w-10 h-10 rounded-full bg-surface-container-high border border-white/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">swap_vert</span>
+</div>
+</div>
+<div>
+<label class="block text-label-caps text-slate-500 mb-sm uppercase tracking-wider">Simulation Target</label>
+<div class="relative">
+<input class="w-full bg-white/5 border border-white/20 border-dashed rounded-lg py-3 px-4 text-primary/50 font-medium cursor-not-allowed outline-none" placeholder="James White" readonly="" type="text"/>
+<div class="absolute right-3 top-3">
+<span class="material-symbols-outlined text-primary text-sm animate-pulse">edit</span>
+</div>
+</div>
+</div>
+</div>
+<button class="w-full mt-xl bg-primary text-background font-black py-4 rounded-lg flex items-center justify-center space-x-sm hover:bg-[#F0F0F0] transition-all transform active:scale-95 shadow-[0_0_30px_rgba(255,255,255,0.2)]">
+<span class="material-symbols-outlined">play_circle</span>
+<span>Change to James White</span>
+</button>
+</div>
+<!-- Frozen Particles Concept -->
+<div class="glass-card rounded-xl p-md border-white/5 flex items-center space-x-md">
+<div class="w-12 h-12 rounded bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-slate-400">ac_unit</span>
+</div>
+<div>
+<p class="text-label-caps text-slate-500 uppercase">Engine Status</p>
+<p class="text-sm font-bold text-primary">Simulation Frozen</p>
+</div>
+<div class="ml-auto">
+<div class="flex space-x-1">
+<div class="w-1 h-1 bg-primary rounded-full"></div>
+<div class="w-1 h-1 bg-white/20 rounded-full"></div>
+<div class="w-1 h-1 bg-white/20 rounded-full"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Contextual Note -->
+<div class="mt-2xl text-center">
+<p class="text-slate-500 text-xs font-medium uppercase tracking-[0.2em]">Step 1 of 2: Baseline Detection Complete</p>
+<div class="mt-md flex justify-center space-x-2">
+<div class="w-12 h-1 bg-primary rounded-full"></div>
+<div class="w-12 h-1 bg-white/10 rounded-full"></div>
+</div>
+</div>
+</div>
+</main>
+<!-- FAB (Suppressed based on rules, not relevant for this detail task) -->
+</body></html>

@@ -550,6 +550,7 @@ async def upload_with_job(file: UploadFile = File(...)):
         "columns": list(df.columns),
         "protected_attributes": protected,
         "filename": file.filename,
+        "dataset_id": job_id,
         "upload_id": job_id,
         "job_id": job_id,
         "run_id": run_id,
@@ -577,6 +578,8 @@ async def audit_with_fallback(request: FastAPIRequest):
         pass
     
     job_id = body.get("job_id")
+    dataset_id = body.get("dataset_id")
+    upload_id = body.get("upload_id") or dataset_id
     dataset_name = body.get("dataset") or "uploaded_file"
     fast_mode = body.get("fast_mode", False)
     df: pd.DataFrame | None = None

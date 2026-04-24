@@ -1,30 +1,18 @@
-import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
-import Layout from './components/layout/Layout';
-import Dashboard from './pages/Dashboard';
-import AuditResults from './pages/AuditResults';
-import ReportPreview from './pages/ReportPreview';
-
-function AppContent() {
-  const navigate = useNavigate();
-  const handleRunNewAudit = () => navigate('/');
-
-  return (
-    <Layout onRunNewAudit={handleRunNewAudit}>
-      <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/audit/:jobId" element={<AuditResults />} />
-        <Route path="/report" element={<ReportPreview />} />
-        <Route path="*" element={<Dashboard />} />
-      </Routes>
-    </Layout>
-  );
-}
+import { Routes, Route } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import Dashboard from "./pages/Dashboard";
 
 function App() {
   return (
-    <BrowserRouter>
-      <AppContent />
-    </BrowserRouter>
+    <div className="min-h-screen bg-slate-950 text-white overflow-x-hidden">
+      <Navbar />
+      <main className="pt-24">
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/audit/:jobId" element={<Dashboard />} />
+        </Routes>
+      </main>
+    </div>
   );
 }
 

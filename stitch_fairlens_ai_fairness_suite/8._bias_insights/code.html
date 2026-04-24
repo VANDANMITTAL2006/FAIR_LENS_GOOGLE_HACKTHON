@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-fixed": "#211a15",
+                    "primary": "#ffffff",
+                    "surface": "#131313",
+                    "on-secondary-fixed-variant": "#404752",
+                    "outline-variant": "#44474a",
+                    "surface-tint": "#c4c7ca",
+                    "tertiary-fixed": "#ede0d6",
+                    "on-primary-container": "#626568",
+                    "on-secondary": "#2a313b",
+                    "tertiary-fixed-dim": "#d0c4bb",
+                    "secondary-container": "#404752",
+                    "on-error-container": "#ffdad6",
+                    "surface-container": "#201f20",
+                    "secondary": "#c0c7d3",
+                    "on-primary-fixed": "#191c1f",
+                    "tertiary-container": "#ede0d6",
+                    "on-primary": "#2d3134",
+                    "on-background": "#e5e2e1",
+                    "primary-fixed": "#e0e2e6",
+                    "outline": "#8f9194",
+                    "surface-container-high": "#2a2a2a",
+                    "error": "#ffb4ab",
+                    "tertiary": "#ffffff",
+                    "surface-container-low": "#1c1b1c",
+                    "surface-container-lowest": "#0e0e0e",
+                    "secondary-fixed-dim": "#c0c7d3",
+                    "on-error": "#690005",
+                    "error-container": "#93000a",
+                    "inverse-primary": "#5c5f62",
+                    "primary-container": "#e0e2e6",
+                    "primary-fixed-dim": "#c4c7ca",
+                    "on-tertiary-container": "#6c635b",
+                    "on-surface": "#e5e2e1",
+                    "on-tertiary-fixed-variant": "#4d453e",
+                    "on-surface-variant": "#c5c6ca",
+                    "inverse-surface": "#e5e2e1",
+                    "inverse-on-surface": "#313030",
+                    "surface-bright": "#3a3939",
+                    "on-secondary-fixed": "#151c25",
+                    "secondary-fixed": "#dce3f0",
+                    "background": "#131313",
+                    "on-tertiary": "#362f29",
+                    "surface-dim": "#131313",
+                    "on-primary-fixed-variant": "#44474a",
+                    "on-secondary-container": "#afb5c2",
+                    "surface-variant": "#353435",
+                    "surface-container-highest": "#353435"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin": "32px",
+                    "sm": "8px",
+                    "2xl": "64px",
+                    "gutter": "24px",
+                    "lg": "24px",
+                    "unit": "4px",
+                    "xs": "4px",
+                    "md": "16px",
+                    "xl": "40px"
+            },
+            "fontFamily": {
+                    "display-xl": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "title-sm": ["Inter"],
+                    "body-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "label-caps": ["Inter"]
+            },
+            "fontSize": {
+                    "display-xl": ["60px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "display-lg": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "title-sm": ["20px", {"lineHeight": "1.4", "letterSpacing": "0", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}],
+                    "headline-md": ["30px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "label-caps": ["12px", {"lineHeight": "1.0", "letterSpacing": "0.05em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #0B0F14;
+            color: #E5E7EB;
+        }
+        .glass-card {
+            background: rgba(17, 24, 39, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .bias-gradient-red {
+            background: linear-gradient(90deg, #111827 0%, #93000a 100%);
+        }
+        .bias-gradient-green {
+            background: linear-gradient(90deg, #111827 0%, #166534 100%);
+        }
+    </style>
+</head>
+<body class="antialiased">
+<!-- TopNavBar -->
+<nav class="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-8 h-16 bg-[#111827]/80 backdrop-blur-md border-b border-white/10 shadow-2xl shadow-black/40">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold tracking-tighter text-[#E5E7EB]">FairLens</span>
+<div class="hidden md:flex items-center gap-6 font-inter tracking-tight font-medium">
+<a class="text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all duration-200 px-3 py-1 rounded" href="#">Dashboard</a>
+<a class="text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all duration-200 px-3 py-1 rounded" href="#">Models</a>
+<a class="text-[#E5E7EB] border-b-2 border-[#E5E7EB] pb-1 px-1" href="#">Reports</a>
+<a class="text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all duration-200 px-3 py-1 rounded" href="#">Datasets</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">search</span>
+<input class="bg-[#0B0F14] border border-white/10 rounded-lg pl-10 pr-4 py-1.5 text-sm focus:outline-none focus:border-white/20 w-64" placeholder="Search audits..." type="text"/>
+</div>
+<button class="material-symbols-outlined text-slate-400 hover:text-white transition-colors">notifications</button>
+<button class="material-symbols-outlined text-slate-400 hover:text-white transition-colors">settings</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-white/20">
+<img alt="Analyst profile" data-alt="close-up portrait of a professional data analyst with a clean tech aesthetic and neutral studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhWt9M6DHlRJBq-C4DdQ415sKTgt5Jj-Z5fJAapx39MxJmt68Rg2bzAfV88bdcU9QgeOEhn26AyvyGkmEiu4KhTzlxjfAJ1Jgj-8II9YZcqDnFD9FqVPr0Plw_EzPuVamQd9pi6CCjrLRYJb5xzUgSTttV81EiYlQ6lmykfQw476KiqDzGbKJtoK2GGXhzdkS6FNHwfEmGuhMqoYA4Wl_-X6Vj0YUJt45UH4aq9asibmjqEJUdgAHMvAXb1w1GKLa6XD5K-o_Q8mk"/>
+</div>
+</div>
+</nav>
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full w-64 border-r border-white/5 bg-[#0B0F14]/95 backdrop-blur-2xl shadow-[20px_0px_40px_rgba(0,0,0,0.5)] z-40">
+<div class="flex flex-col h-full p-4 pt-20 space-y-4">
+<div class="px-4 mb-6">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 bg-white/10 rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-lg">shield</span>
+</div>
+<div>
+<h3 class="text-lg font-black text-[#E5E7EB] leading-none">Enterprise Mode</h3>
+<p class="text-[10px] text-slate-500 uppercase tracking-widest mt-1">Algorithm Audit</p>
+</div>
+</div>
+</div>
+<nav class="space-y-1 font-inter text-sm antialiased">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-slate-300 hover:bg-white/5 transition-colors duration-300 rounded-lg group" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Overview</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-white/10 text-white rounded-lg shadow-[0_0_15px_rgba(255,255,255,0.05)] transition-transform active:translate-x-1" href="#">
+<span class="material-symbols-outlined">query_stats</span>
+<span>Bias Detection</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-slate-300 hover:bg-white/5 transition-colors duration-300 rounded-lg" href="#">
+<span class="material-symbols-outlined">balance</span>
+<span>Fairness Metrics</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-slate-300 hover:bg-white/5 transition-colors duration-300 rounded-lg" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+<span>Audit Logs</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-slate-300 hover:bg-white/5 transition-colors duration-300 rounded-lg" href="#">
+<span class="material-symbols-outlined">hub</span>
+<span>Enterprise API</span>
+</a>
+</nav>
+<div class="pt-4 px-4">
+<button class="w-full bg-[#E5E7EB] text-[#0B0F14] font-bold py-2.5 rounded-lg text-sm hover:bg-white transition-all active:scale-[0.98]">
+                    Run New Audit
+                </button>
+</div>
+<div class="mt-auto space-y-1 border-t border-white/10 pt-4">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-slate-300 transition-colors duration-300" href="#">
+<span class="material-symbols-outlined">help</span>
+<span>Support</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-slate-300 transition-colors duration-300" href="#">
+<span class="material-symbols-outlined">description</span>
+<span>Documentation</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 pt-24 px-margin pb-2xl">
+<header class="mb-xl flex justify-between items-end">
+<div>
+<nav class="flex items-center gap-2 text-label-caps text-slate-500 mb-2">
+<span>AUDITS</span>
+<span class="material-symbols-outlined text-[10px]">chevron_right</span>
+<span>LOAN_APPROVAL_V4</span>
+<span class="material-symbols-outlined text-[10px]">chevron_right</span>
+<span class="text-primary">BIAS_INSIGHTS</span>
+</nav>
+<h1 class="font-display-lg text-display-lg text-primary">Bias Insights</h1>
+<p class="font-body-lg text-body-lg text-slate-400 mt-2">Executive summary of algorithmic fairness across primary protected attributes.</p>
+</div>
+<div class="flex gap-4">
+<button class="flex items-center gap-2 px-4 py-2 bg-surface-container border border-white/10 rounded-lg text-sm hover:bg-white/5 transition-all">
+<span class="material-symbols-outlined text-lg">download</span>
+                    Export PDF
+                </button>
+<button class="flex items-center gap-2 px-4 py-2 bg-primary text-surface-dim rounded-lg text-sm font-bold hover:bg-opacity-90 transition-all">
+<span class="material-symbols-outlined text-lg">share</span>
+                    Share Insight
+                </button>
+</div>
+</header>
+<!-- Bento Grid of Insights -->
+<div class="grid grid-cols-12 gap-lg">
+<!-- Primary Insight Card -->
+<div class="col-span-12 lg:col-span-8 glass-card p-xl rounded-xl relative overflow-hidden group">
+<div class="absolute top-0 right-0 w-64 h-64 bg-error/5 blur-[100px] -mr-32 -mt-32 transition-all group-hover:bg-error/10"></div>
+<div class="flex justify-between items-start mb-xl">
+<div class="flex items-center gap-3 px-3 py-1 rounded-full bg-error/10 border border-error/20 text-error text-label-caps">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">warning</span>
+                        CRITICAL DISPARITY
+                    </div>
+<span class="text-slate-500 text-sm font-mono">ID: BR-7721</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-primary mb-md max-w-2xl leading-tight">
+                    Women are <span class="text-error font-extrabold">32.4% less likely</span> to be selected for high-limit credit lines compared to baseline demographic parity.
+                </h2>
+<div class="flex flex-col gap-sm mt-xl">
+<div class="flex justify-between text-label-caps text-slate-400 mb-1">
+<span>Protected Class: Gender</span>
+<span>Confidence: 99.2%</span>
+</div>
+<div class="h-1.5 w-full bg-white/5 rounded-full overflow-hidden flex">
+<div class="h-full bg-error" style="width: 32.4%"></div>
+<div class="h-full bg-white/10 flex-1"></div>
+</div>
+</div>
+<div class="mt-xl flex items-center gap-6">
+<div class="flex flex-col">
+<span class="text-label-caps text-slate-500">SAMPLES</span>
+<span class="font-title-sm text-title-sm text-primary">1.2M</span>
+</div>
+<div class="h-8 w-px bg-white/10"></div>
+<div class="flex flex-col">
+<span class="text-label-caps text-slate-500">IMPACT RATIO</span>
+<span class="font-title-sm text-title-sm text-primary">0.67</span>
+</div>
+<div class="h-8 w-px bg-white/10"></div>
+<div class="flex flex-col">
+<span class="text-label-caps text-slate-500">P-VALUE</span>
+<span class="font-title-sm text-title-sm text-primary">&lt; 0.001</span>
+</div>
+</div>
+</div>
+<!-- Metric Breakdown Side Card -->
+<div class="col-span-12 lg:col-span-4 glass-card p-lg rounded-xl flex flex-col justify-between">
+<div>
+<h3 class="font-title-sm text-title-sm text-primary mb-4">Metric Stability</h3>
+<div class="space-y-4">
+<div class="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/5">
+<span class="text-sm text-slate-300">Demographic Parity</span>
+<span class="text-error font-mono text-sm">Failed</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/5">
+<span class="text-sm text-slate-300">Equal Opportunity</span>
+<span class="text-error font-mono text-sm">Failed</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/5">
+<span class="text-sm text-slate-300">Predictive Parity</span>
+<span class="text-primary font-mono text-sm">Passed</span>
+</div>
+</div>
+</div>
+<div class="mt-8">
+<p class="text-xs text-slate-500 leading-relaxed italic border-l-2 border-white/10 pl-4">
+                        "The observed disparity exceeds the 80% rule for disparate impact, requiring immediate algorithmic intervention or business justification."
+                    </p>
+</div>
+</div>
+<!-- Second Insight Card - Age -->
+<div class="col-span-12 md:col-span-6 glass-card p-lg rounded-xl border-l-4 border-l-primary/30">
+<div class="flex justify-between mb-4">
+<div class="flex items-center gap-2 text-primary/60 text-label-caps">
+<span class="material-symbols-outlined text-sm">person_search</span>
+                        AGE DISPARITY
+                    </div>
+<span class="text-primary font-bold">Stable</span>
+</div>
+<h3 class="font-title-sm text-title-sm text-primary mb-md">
+                    No significant bias detected across age cohorts 18-65+.
+                </h3>
+<p class="text-body-md text-slate-400">
+                    Selection rates remain within the <span class="text-primary">±2% threshold</span> across all validated generational segments.
+                </p>
+<div class="mt-8 h-24 flex items-end gap-2">
+<div class="flex-1 bg-white/10 h-[70%] rounded-t-sm"></div>
+<div class="flex-1 bg-white/10 h-[68%] rounded-t-sm"></div>
+<div class="flex-1 bg-white/10 h-[71%] rounded-t-sm"></div>
+<div class="flex-1 bg-white/10 h-[69%] rounded-t-sm"></div>
+<div class="flex-1 bg-white/20 h-[70%] rounded-t-sm border-t-2 border-primary"></div>
+<div class="flex-1 bg-white/10 h-[72%] rounded-t-sm"></div>
+</div>
+</div>
+<!-- Third Insight Card - Region -->
+<div class="col-span-12 md:col-span-6 glass-card p-lg rounded-xl border-l-4 border-l-error">
+<div class="flex justify-between mb-4">
+<div class="flex items-center gap-2 text-error text-label-caps">
+<span class="material-symbols-outlined text-sm">public</span>
+                        REGIONAL BIAS
+                    </div>
+<span class="text-error font-bold">High Alert</span>
+</div>
+<h3 class="font-title-sm text-title-sm text-primary mb-md">
+                    Applicants in ZIP codes 10001-11249 show <span class="text-error">18% higher rejection</span> rates.
+                </h3>
+<p class="text-body-md text-slate-400">
+                    Strong correlation detected between rejection rates and historically redlined urban districts.
+                </p>
+<div class="mt-6 flex items-center justify-between px-4 py-3 bg-error/5 border border-error/10 rounded-lg">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-error">gavel</span>
+<span class="text-sm text-slate-200 font-medium">Compliance Risk: High</span>
+</div>
+<button class="text-xs text-error font-bold underline">Review Logic</button>
+</div>
+</div>
+<!-- Bottom Data Table / Audit Trail -->
+<div class="col-span-12 glass-card rounded-xl overflow-hidden">
+<div class="px-lg py-4 border-b border-white/10 flex justify-between items-center bg-white/5">
+<h3 class="text-label-caps text-slate-400">FAIRNESS LOGS (REPRODUCIBILITY TRAIL)</h3>
+<div class="flex items-center gap-4">
+<span class="text-[10px] text-slate-500 font-mono">SEED: 0x9928AF</span>
+<span class="text-[10px] text-slate-500 font-mono">TIMESTAMP: 2023.11.14:14:02:44</span>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="bg-[#0B0F14]/50 text-slate-500 text-[10px] uppercase tracking-wider font-bold">
+<tr>
+<th class="px-lg py-3">Attribute</th>
+<th class="px-lg py-3">Intersection</th>
+<th class="px-lg py-3">Score</th>
+<th class="px-lg py-3">Delta</th>
+<th class="px-lg py-3">Status</th>
+</tr>
+</thead>
+<tbody class="text-sm text-slate-300">
+<tr class="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
+<td class="px-lg py-4 font-medium">Gender</td>
+<td class="px-lg py-4">Female / Under 30</td>
+<td class="px-lg py-4 font-mono">0.62</td>
+<td class="px-lg py-4 text-error font-mono">-0.38</td>
+<td class="px-lg py-4"><span class="px-2 py-0.5 rounded-full bg-error/10 text-error text-[10px] font-bold">CRITICAL</span></td>
+</tr>
+<tr class="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
+<td class="px-lg py-4 font-medium">Ethnicity</td>
+<td class="px-lg py-4">Hispanic / West Coast</td>
+<td class="px-lg py-4 font-mono">0.84</td>
+<td class="px-lg py-4 text-slate-400 font-mono">-0.16</td>
+<td class="px-lg py-4"><span class="px-2 py-0.5 rounded-full bg-slate-500/10 text-slate-400 text-[10px] font-bold">WARNING</span></td>
+</tr>
+<tr class="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
+<td class="px-lg py-4 font-medium">Income</td>
+<td class="px-lg py-4">Low / Rural</td>
+<td class="px-lg py-4 font-mono">0.96</td>
+<td class="px-lg py-4 text-primary font-mono">-0.04</td>
+<td class="px-lg py-4"><span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold">PASSED</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</main>
+<!-- Floating Bias Indicator Widget (Contextual UI) -->
+<div class="fixed bottom-8 right-8 z-50">
+<div class="glass-card p-4 rounded-xl shadow-2xl flex items-center gap-4 max-w-xs border-primary/20">
+<div class="w-12 h-12 rounded-full border-4 border-error flex items-center justify-center">
+<span class="text-xs font-bold text-error">68%</span>
+</div>
+<div>
+<p class="text-xs font-bold text-primary">Global Fairness Index</p>
+<p class="text-[10px] text-slate-500 mt-1 leading-tight">Overall model score is below enterprise compliance threshold (80%).</p>
+</div>
+<button class="material-symbols-outlined text-slate-400 hover:text-white transition-colors">close</button>
+</div>
+</div>
+</body></html>

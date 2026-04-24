@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            background-color: #0B0F14;
+            color: #E5E7EB;
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(17, 24, 39, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .bias-gradient-red {
+            background: linear-gradient(90deg, rgba(147, 0, 10, 0.2) 0%, rgba(255, 180, 171, 0.05) 100%);
+        }
+        .bias-gradient-green {
+            background: linear-gradient(90deg, rgba(21, 28, 37, 0.2) 0%, rgba(192, 199, 211, 0.05) 100%);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-tertiary-fixed": "#211a15",
+                      "primary": "#ffffff",
+                      "surface": "#131313",
+                      "on-secondary-fixed-variant": "#404752",
+                      "outline-variant": "#44474a",
+                      "surface-tint": "#c4c7ca",
+                      "tertiary-fixed": "#ede0d6",
+                      "on-primary-container": "#626568",
+                      "on-secondary": "#2a313b",
+                      "tertiary-fixed-dim": "#d0c4bb",
+                      "secondary-container": "#404752",
+                      "on-error-container": "#ffdad6",
+                      "surface-container": "#201f20",
+                      "secondary": "#c0c7d3",
+                      "on-primary-fixed": "#191c1f",
+                      "tertiary-container": "#ede0d6",
+                      "on-primary": "#2d3134",
+                      "on-background": "#e5e2e1",
+                      "primary-fixed": "#e0e2e6",
+                      "outline": "#8f9194",
+                      "surface-container-high": "#2a2a2a",
+                      "error": "#ffb4ab",
+                      "tertiary": "#ffffff",
+                      "surface-container-low": "#1c1b1c",
+                      "surface-container-lowest": "#0e0e0e",
+                      "secondary-fixed-dim": "#c0c7d3",
+                      "on-error": "#690005",
+                      "error-container": "#93000a",
+                      "inverse-primary": "#5c5f62",
+                      "primary-container": "#e0e2e6",
+                      "primary-fixed-dim": "#c4c7ca",
+                      "on-tertiary-container": "#6c635b",
+                      "on-surface": "#e5e2e1",
+                      "on-tertiary-fixed-variant": "#4d453e",
+                      "on-surface-variant": "#c5c6ca",
+                      "inverse-surface": "#e5e2e1",
+                      "inverse-on-surface": "#313030",
+                      "surface-bright": "#3a3939",
+                      "on-secondary-fixed": "#151c25",
+                      "secondary-fixed": "#dce3f0",
+                      "background": "#131313",
+                      "on-tertiary": "#362f29",
+                      "surface-dim": "#131313",
+                      "on-primary-fixed-variant": "#44474a",
+                      "on-secondary-container": "#afb5c2",
+                      "surface-variant": "#353435",
+                      "surface-container-highest": "#353435"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin": "32px",
+                      "sm": "8px",
+                      "2xl": "64px",
+                      "gutter": "24px",
+                      "lg": "24px",
+                      "unit": "4px",
+                      "xs": "4px",
+                      "md": "16px",
+                      "xl": "40px"
+              },
+              "fontFamily": {
+                      "display-xl": ["Inter"],
+                      "display-lg": ["Inter"],
+                      "title-sm": ["Inter"],
+                      "body-md": ["Inter"],
+                      "body-lg": ["Inter"],
+                      "headline-md": ["Inter"],
+                      "label-caps": ["Inter"]
+              },
+              "fontSize": {
+                      "display-xl": ["60px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                      "display-lg": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "title-sm": ["20px", {"lineHeight": "1.4", "letterSpacing": "0", "fontWeight": "600"}],
+                      "body-md": ["16px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}],
+                      "body-lg": ["18px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}],
+                      "headline-md": ["30px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "label-caps": ["12px", {"lineHeight": "1.0", "letterSpacing": "0.05em", "fontWeight": "600"}]
+              }
+            },
+          },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background selection:bg-primary selection:text-surface antialiased">
+<!-- TopNavBar -->
+<nav class="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-8 h-16 bg-[#111827]/80 backdrop-blur-md border-b border-white/10 shadow-2xl shadow-black/40">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold tracking-tighter text-[#E5E7EB]">FairLens</span>
+<div class="hidden md:flex items-center gap-6">
+<a class="font-inter tracking-tight font-medium text-slate-400 hover:text-slate-200 transition-all duration-200" href="#">Dashboard</a>
+<a class="font-inter tracking-tight font-medium text-slate-400 hover:text-slate-200 transition-all duration-200" href="#">Models</a>
+<a class="font-inter tracking-tight font-medium text-[#E5E7EB] border-b-2 border-[#E5E7EB] pb-1 transition-all duration-200" href="#">Reports</a>
+<a class="font-inter tracking-tight font-medium text-slate-400 hover:text-slate-200 transition-all duration-200" href="#">Datasets</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-400 hover:bg-white/5 rounded-full transition-all active:scale-95">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-slate-400 hover:bg-white/5 rounded-full transition-all active:scale-95">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-surface-container-high overflow-hidden border border-white/10">
+<img alt="Analyst profile" data-alt="Professional headshot of a female data analyst in a modern office environment with soft natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOxval_3HrwfMpPQmpIwNqCNCPdqc_FfsMtOrt9F7fb8CVIZxaOy4InnrlibHdNGdV7J_BicaFx6ijT8r9E2nfAHOcatj7SaIK-7Cp9mQ6z8AeQIZjRP34_4uH3rH1lUE6_EltR5-0-BKZbBtcEEBZxyAPy1PiV0auiflxA7uL1yk8zpYdWjmQT62ydH4KCNUQzI39zjkftqEDuoOA8u0TAKLo31EGg0YL98jydf4cfgeam4iiw8_iDhs4VMS8UXV-7OcMMXdMeT0"/>
+</div>
+</div>
+</nav>
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full w-64 border-r border-white/10 bg-[#0B0F14]/95 backdrop-blur-2xl shadow-[20px_0px_40px_rgba(0,0,0,0.5)] z-40 hidden lg:flex flex-col p-4 pt-20 space-y-4">
+<div class="px-4 py-2 mb-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-surface" data-icon="hub">hub</span>
+</div>
+<div>
+<h3 class="text-lg font-black text-[#E5E7EB] leading-none">Enterprise Mode</h3>
+<p class="text-[10px] text-slate-500 font-medium uppercase tracking-widest mt-1">Algorithm Audit</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-4 py-2.5 font-inter text-sm text-slate-500 hover:bg-white/5 hover:text-slate-300 rounded-lg transition-colors duration-300" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="dashboard">dashboard</span>
+<span>Overview</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 font-inter text-sm text-slate-500 hover:bg-white/5 hover:text-slate-300 rounded-lg transition-colors duration-300" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="query_stats">query_stats</span>
+<span>Bias Detection</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 font-inter text-sm bg-white/10 text-white rounded-lg shadow-[0_0_15px_rgba(255,255,255,0.05)] transition-transform active:translate-x-1" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="balance">balance</span>
+<span>Fairness Metrics</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 font-inter text-sm text-slate-500 hover:bg-white/5 hover:text-slate-300 rounded-lg transition-colors duration-300" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="receipt_long">receipt_long</span>
+<span>Audit Logs</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 font-inter text-sm text-slate-500 hover:bg-white/5 hover:text-slate-300 rounded-lg transition-colors duration-300" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="hub">hub</span>
+<span>Enterprise API</span>
+</a>
+</nav>
+<div class="mt-auto pt-4 border-t border-white/10 space-y-1">
+<button class="w-full bg-primary text-surface font-bold py-3 rounded-lg mb-4 hover:opacity-90 transition-opacity active:scale-95 text-sm">
+                Run New Audit
+            </button>
+<a class="flex items-center gap-3 px-4 py-2 font-inter text-sm text-slate-500 hover:text-slate-300 transition-colors" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="help">help</span>
+<span>Support</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 font-inter text-sm text-slate-500 hover:text-slate-300 transition-colors" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="description">description</span>
+<span>Documentation</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="lg:ml-64 pt-24 px-margin pb-2xl min-h-screen">
+<div class="max-w-6xl mx-auto">
+<!-- Header & Actions -->
+<header class="flex flex-col md:flex-row md:items-end justify-between mb-xl gap-lg">
+<div>
+<div class="flex items-center gap-sm mb-xs">
+<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-error-container text-on-error-container">Critical Issue Detected</span>
+<span class="text-slate-500 text-sm font-medium">Report ID: FL-2024-089</span>
+</div>
+<h1 class="font-display-lg text-display-lg text-primary">Reports &amp; Remediation</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mt-sm">Reviewing demographic parity gaps in Credit Scoring Model v4.2. Apply remediation steps to harmonize predictive outcomes across protected classes.</p>
+</div>
+<div class="flex items-center gap-md">
+<button class="flex items-center gap-2 px-md py-3 glass-card rounded-lg hover:bg-white/10 transition-all text-sm font-medium text-on-surface">
+<span class="material-symbols-outlined text-lg" data-icon="share">share</span>
+                        Share Report
+                    </button>
+<button class="flex items-center gap-2 px-md py-3 bg-primary text-surface rounded-lg hover:opacity-90 transition-all text-sm font-bold shadow-xl shadow-white/5">
+<span class="material-symbols-outlined text-lg" data-icon="picture_as_pdf">picture_as_pdf</span>
+                        Download PDF Report
+                    </button>
+</div>
+</header>
+<!-- Remediation Workspace Bento Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-lg">
+<!-- Left: Fix View & Comparison -->
+<div class="lg:col-span-8 space-y-lg">
+<div class="glass-card rounded-xl overflow-hidden border border-white/10">
+<div class="px-lg py-md border-b border-white/5 flex items-center justify-between bg-white/5">
+<h2 class="font-title-sm text-title-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="auto_fix_high">auto_fix_high</span>
+                                Comparative Analysis
+                            </h2>
+<!-- Toggle Switch -->
+<div class="bg-surface-container-lowest p-1 rounded-full flex gap-1 border border-white/10">
+<button class="px-4 py-1.5 rounded-full text-xs font-bold transition-all bg-error-container text-on-error-container shadow-sm">
+                                    Before (Bias)
+                                </button>
+<button class="px-4 py-1.5 rounded-full text-xs font-bold transition-all text-slate-500 hover:text-slate-300">
+                                    After (Remediated)
+                                </button>
+</div>
+</div>
+<!-- Visualization Area -->
+<div class="p-lg">
+<div class="relative h-80 w-full mb-lg flex items-end gap-1 px-md">
+<!-- Chart Background Lines -->
+<div class="absolute inset-0 flex flex-col justify-between py-10 opacity-20 pointer-events-none">
+<div class="border-t border-slate-500 w-full"></div>
+<div class="border-t border-slate-500 w-full"></div>
+<div class="border-t border-slate-500 w-full"></div>
+<div class="border-t border-slate-500 w-full"></div>
+</div>
+<!-- Bar Chart Mock -->
+<div class="flex-1 h-3/4 bias-gradient-red rounded-t-lg relative group transition-all duration-500">
+<div class="absolute -top-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-error-container text-on-error-container px-2 py-1 rounded text-[10px] font-bold">84% Approval</div>
+</div>
+<div class="flex-1 h-[90%] bias-gradient-red rounded-t-lg relative group opacity-60"></div>
+<div class="flex-1 h-[45%] bias-gradient-red rounded-t-lg relative group">
+<div class="absolute -top-10 left-1/2 -translate-x-1/2 opacity-100 bg-error-container text-on-error-container px-2 py-1 rounded text-[10px] font-bold">42% Approval</div>
+</div>
+<div class="flex-1 h-[85%] bias-gradient-red rounded-t-lg relative group opacity-60"></div>
+<div class="flex-1 h-[38%] bias-gradient-red rounded-t-lg relative group"></div>
+<div class="flex-1 h-[92%] bias-gradient-red rounded-t-lg relative group opacity-60"></div>
+</div>
+<div class="grid grid-cols-3 gap-lg mt-md">
+<div class="p-md rounded-lg bg-surface-container-low border border-white/5">
+<span class="text-label-caps font-label-caps text-slate-500 block mb-1 uppercase">Disparate Impact Ratio</span>
+<span class="text-headline-md font-headline-md text-error">0.48</span>
+<p class="text-xs text-on-error-container mt-1">Significant Adverse Impact</p>
+</div>
+<div class="p-md rounded-lg bg-surface-container-low border border-white/5">
+<span class="text-label-caps font-label-caps text-slate-500 block mb-1 uppercase">Model Precision</span>
+<span class="text-headline-md font-headline-md text-primary">89.2%</span>
+<p class="text-xs text-slate-400 mt-1">Base performance metric</p>
+</div>
+<div class="p-md rounded-lg bg-surface-container-low border border-white/5">
+<span class="text-label-caps font-label-caps text-slate-500 block mb-1 uppercase">Affected Population</span>
+<span class="text-headline-md font-headline-md text-primary">12,400</span>
+<p class="text-xs text-slate-400 mt-1">Applications in scope</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Remediation Log -->
+<div class="glass-card rounded-xl p-lg">
+<h3 class="font-title-sm text-title-sm mb-lg flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="history">history</span>
+                            Remediation Pipeline
+                        </h3>
+<div class="space-y-md">
+<div class="flex items-start gap-md p-md rounded-lg border border-white/5 hover:border-white/20 transition-all">
+<div class="w-8 h-8 rounded bg-primary-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined" data-icon="rule">rule</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-center mb-xs">
+<span class="font-bold text-sm">Step 1: Remove Feature 'Zip_Code'</span>
+<span class="text-[10px] bg-white/10 px-2 py-0.5 rounded uppercase font-bold text-slate-400">Processed</span>
+</div>
+<p class="text-sm text-slate-400">Removing proxy variables associated with geographic discrimination. Minimal impact on AUC-ROC (-0.02).</p>
+</div>
+</div>
+<div class="flex items-start gap-md p-md rounded-lg border border-white/10 bg-white/5 relative">
+<div class="w-8 h-8 rounded bg-primary flex items-center justify-center text-surface shrink-0">
+<span class="material-symbols-outlined" data-icon="tune">tune</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-center mb-xs">
+<span class="font-bold text-sm">Step 2: Adjust Decision Threshold</span>
+<span class="text-[10px] bg-primary text-surface px-2 py-0.5 rounded uppercase font-bold animate-pulse">Active</span>
+</div>
+<p class="text-sm text-slate-300">Calibrating equalized odds by adjusting the rejection threshold from 0.75 to 0.68 for Group B.</p>
+<div class="mt-md h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary w-2/3"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right: Metrics & Documentation -->
+<div class="lg:col-span-4 space-y-lg">
+<!-- Audit Summary Card -->
+<div class="glass-card rounded-xl p-lg bg-surface-container-highest/50">
+<h3 class="font-title-sm text-title-sm mb-md">Audit Context</h3>
+<div class="space-y-md">
+<div class="flex items-center justify-between py-2 border-b border-white/5">
+<span class="text-sm text-slate-500">Compliance Standard</span>
+<span class="text-sm font-medium">SR 11-7 / OCC</span>
+</div>
+<div class="flex items-center justify-between py-2 border-b border-white/5">
+<span class="text-sm text-slate-500">Auditor</span>
+<span class="text-sm font-medium">Sarah Jenkins</span>
+</div>
+<div class="flex items-center justify-between py-2 border-b border-white/5">
+<span class="text-sm text-slate-500">Review Frequency</span>
+<span class="text-sm font-medium">Quarterly</span>
+</div>
+<div class="flex items-center justify-between py-2">
+<span class="text-sm text-slate-500">Risk Profile</span>
+<span class="text-xs font-bold text-error uppercase">High Priority</span>
+</div>
+</div>
+</div>
+<!-- Impact Analysis -->
+<div class="glass-card rounded-xl p-lg">
+<h3 class="font-title-sm text-title-sm mb-md">Expected Outcome</h3>
+<div class="relative w-full aspect-square flex items-center justify-center">
+<!-- Circular Progress Visualization -->
+<svg class="w-full h-full transform -rotate-90">
+<circle class="text-white/5" cx="50%" cy="50%" fill="transparent" r="40%" stroke="currentColor" stroke-width="8"></circle>
+<circle class="text-primary" cx="50%" cy="50%" fill="transparent" r="40%" stroke="currentColor" stroke-dasharray="251.2" stroke-dashoffset="50" stroke-width="8"></circle>
+</svg>
+<div class="absolute flex flex-col items-center">
+<span class="text-display-lg font-display-lg leading-none">82</span>
+<span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Fairness Score</span>
+</div>
+</div>
+<p class="text-xs text-center text-slate-500 mt-4 px-4 italic">Estimated projection following the completion of current remediation steps.</p>
+</div>
+<!-- Compliance Export -->
+<div class="p-lg rounded-xl bg-primary-container/10 border border-primary/20 space-y-md">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="verified">verified</span>
+<span class="font-bold text-sm text-primary">Compliance Ready</span>
+</div>
+<p class="text-xs text-slate-300">This report meets the requirements for internal risk governance and external regulatory disclosures.</p>
+<button class="w-full py-2.5 rounded-lg border border-primary/50 text-primary text-xs font-bold hover:bg-primary hover:text-surface transition-all">
+                            Archive to Ledger
+                        </button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Contextual FAB - Trigger Audit -->
+<div class="fixed bottom-margin right-margin z-50">
+<button class="group flex items-center gap-3 bg-primary text-surface px-6 py-4 rounded-full font-bold shadow-[0_20px_50px_rgba(255,255,255,0.15)] hover:scale-105 transition-transform active:scale-95">
+<span class="material-symbols-outlined" data-icon="add" data-weight="fill">add</span>
+<span class="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-300 whitespace-nowrap">Run New Audit</span>
+</button>
+</div>
+</body></html>
