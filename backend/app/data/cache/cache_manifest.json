@@ -1,0 +1,33 @@
+{
+  "generated_at": "2026-04-24T10:11:21.858306",
+  "files": {
+    "cached_adult.json": {
+      "size_kb": 4.7,
+      "dataset": "UCI Adult Income (HR / Hiring)",
+      "generated_in_seconds": 5.5
+    },
+    "cached_compas.json": {
+      "size_kb": 5.0,
+      "dataset": "COMPAS Recidivism (Criminal Justice)",
+      "generated_in_seconds": 4.4
+    },
+    "cached_hmda.json": {
+      "size_kb": 4.9,
+      "dataset": "HUD HMDA Mortgage (Lending)",
+      "generated_in_seconds": 3.9
+    },
+    "cached_all_datasets.json": {
+      "size_kb": 15.4
+    },
+    "cached_demo_simulation.json": {
+      "gap_percentage_points": 17.96,
+      "demo_effective": true
+    }
+  },
+  "datasets_cached": [
+    "adult",
+    "compas",
+    "hmda"
+  ],
+  "total_time_seconds": 14.6
+}
