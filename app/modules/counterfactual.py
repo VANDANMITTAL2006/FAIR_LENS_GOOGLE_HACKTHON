@@ -1,43 +1,55 @@
-def run_counterfactual(sample: dict) -> dict:
-    """
-    Simulates counterfactual discrimination (e.g., name/group swap).
-    Deterministic fallback for instant response in demo.
-    """
-    base_score = 50
-    
-    # Add weight for positive attributes
-    if int(sample.get("experience", 0)) > 3: 
-        base_score += 15
-    if str(sample.get("education", "")).lower() in ["mit", "stanford", "harvard"]: 
-        base_score += 10
-        
-    # Simulate a biased model that penalizes Female and Asian
-    gender_val = str(sample.get("gender", "")).lower()
-    race_val = str(sample.get("race", "")).lower()
-    
-    bias_gender = -15 if gender_val == "female" else 0
-    bias_race = -10 if race_val == "asian" else 0
-    
-    original_score = base_score + bias_gender + bias_race
-    
-    # Swap to privileged groups
-    after_gender_swap = base_score + bias_race   # Removed gender bias
-    after_race_swap = base_score + bias_gender   # Removed race bias
-    
-    delta = max(after_gender_swap, after_race_swap) - original_score
-    delta_str = f"+{delta}" if delta > 0 else str(delta)
-    
+import pandas as pd
+
+from app.modules.attribute_detector import detect_attributes
+
+
+def _resolve_prediction_column(df: pd.DataFrame) -> str | None:
+    for candidate in ["y_pred", "prediction", "pred", "predicted_label"]:
+        if candidate in df.columns:
+            return candidate
+    for candidate in ["y_true", "outcome", "label", "target", "income_binary", "two_year_recid", "action_taken"]:
+        if candidate in df.columns:
+            return candidate
+    return None
+
+
+def get_counterfactual(df: pd.DataFrame) -> dict:
+    if not hasattr(df, "iloc") or len(df) == 0:
+        return {"status": "cannot_compute", "reason": "empty dataset"}
+
+    protected = detect_attributes(df)
+    if not protected:
+        return {"status": "cannot_compute", "reason": "no protected attribute detected"}
+
+    pred_col = _resolve_prediction_column(df)
+    if pred_col is None:
+        return {"status": "cannot_compute", "reason": "prediction/outcome column missing"}
+
+    group_col = protected[0]
+    work = df[[group_col, pred_col]].copy()
+    work[pred_col] = pd.to_numeric(work[pred_col], errors="coerce")
+    work[group_col] = work[group_col].astype(str)
+    work = work.dropna()
+    if work.empty:
+        return {"status": "cannot_compute", "reason": "insufficient rows after cleaning"}
+
+    group_rates = work.groupby(group_col)[pred_col].mean().sort_values(ascending=False)
+    if len(group_rates) < 2:
+        return {"status": "cannot_compute", "reason": "counterfactual requires at least two groups"}
+
+    best_group = group_rates.index[0]
+    worst_group = group_rates.index[-1]
+    best_rate = float(group_rates.iloc[0])
+    worst_rate = float(group_rates.iloc[-1])
+    delta = round((best_rate - worst_rate) * 100, 2)
+
     return {
-        "original_score": max(0, min(100, original_score)),
-        "after_gender_swap": max(0, min(100, after_gender_swap)),
-        "after_race_swap": max(0, min(100, after_race_swap)),
-        "delta": delta_str
+        "status": "ok",
+        "attribute": group_col,
+        "original_group": str(worst_group),
+        "counterfactual_group": str(best_group),
+        "original_score": round(worst_rate * 100, 2),
+        "counterfactual_score": round(best_rate * 100, 2),
+        "delta": delta,
+        "group_positive_rates": {str(group): round(float(rate) * 100, 2) for group, rate in group_rates.items()},
     }
-
-
-def get_counterfactual(df) -> dict:
-    if hasattr(df, "iloc") and len(df) > 0:
-        sample = df.iloc[0].to_dict()
-    else:
-        sample = {}
-    return run_counterfactual(sample)

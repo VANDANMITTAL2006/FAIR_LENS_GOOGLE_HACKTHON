@@ -1,9 +1,11 @@
 from io import BytesIO
 import json
+from uuid import uuid4
 
 import pandas as pd
 from fastapi import APIRouter, File, UploadFile
 
+from app.config.paths import UPLOAD_DIR
 from app.services.attribute_detector import detect_attributes
 from app.utils.responses import error, success
 
@@ -39,6 +41,11 @@ async def upload(file: UploadFile = File(...)):
     if df.empty:
         return error("File is empty")
 
+    UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+    upload_id = uuid4().hex
+    upload_path = UPLOAD_DIR / f"{upload_id}.csv"
+    df.to_csv(upload_path, index=False)
+
     protected = detect_attributes(df)
     return success(
         {
@@ -46,5 +53,7 @@ async def upload(file: UploadFile = File(...)):
             "columns": list(df.columns),
             "protected_attributes": protected,
             "filename": file.filename,
+            "upload_id": upload_id,
+            "dataset_ref": upload_path.name,
         }
     )

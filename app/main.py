@@ -10,9 +10,8 @@ from fastapi.responses import RedirectResponse, StreamingResponse
 from app.config.paths import CACHED_PREFIX, DATA_DIR
 from app.core.settings import settings
 from app.modules.stream_steps import AUDIT_STEPS
-from app.routers import audit_router, upload_router
+from app.routers import audit_router, debias_router, upload_router
 from app.utils.responses import error, success
-from backend.app.api.debias_route import router as debias_router
 
 # Configure stdout encoding for Windows compatibility
 try:

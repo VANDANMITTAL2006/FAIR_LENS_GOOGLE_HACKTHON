@@ -41,103 +41,103 @@
       "strategies": {
         "reweighting": {
           "di_before": 0.0,
-          "di_after": 0.8758,
-          "eeoc_compliant": true,
-          "accuracy_loss": 1.17
+          "di_after": 0.4425,
+          "eeoc_compliant": false,
+          "accuracy_loss": 1.33
         },
         "threshold_adjustment": {
           "di_before": 0.0,
-          "di_after": 0.9982,
+          "di_after": 0.9997,
           "eeoc_compliant": true,
-          "accuracy_loss": 5.57
+          "accuracy_loss": 5.2
         },
         "feature_removal": {
           "di_before": 0.0,
-          "di_after": 0.8178,
-          "eeoc_compliant": true,
-          "accuracy_loss": 1.27
+          "di_after": 0.7851,
+          "eeoc_compliant": false,
+          "accuracy_loss": 1.2
         }
       },
-      "load_time": 0.05,
-      "run_time": 5.43
+      "load_time": 0.02,
+      "run_time": 2.14
     },
     "compas": {
       "dataset": "COMPAS Recidivism (Criminal Justice)",
       "status": "PASS",
       "strategies": {
         "reweighting": {
-          "di_before": 0.467,
-          "di_after": 0.9984,
+          "di_before": 0.4704,
+          "di_after": 0.9471,
           "eeoc_compliant": true,
-          "accuracy_loss": 0.97
+          "accuracy_loss": 1.24
         },
         "threshold_adjustment": {
-          "di_before": 0.467,
+          "di_before": 0.4704,
           "di_after": 0.9984,
           "eeoc_compliant": true,
-          "accuracy_loss": 1.29
+          "accuracy_loss": 1.38
         },
         "feature_removal": {
-          "di_before": 0.467,
+          "di_before": 0.4704,
           "di_after": 0.7645,
           "eeoc_compliant": false,
-          "accuracy_loss": -0.14
+          "accuracy_loss": -0.05
         }
       },
-      "load_time": 0.07,
-      "run_time": 4.31
+      "load_time": 0.02,
+      "run_time": 1.86
     },
     "hmda": {
       "dataset": "HUD HMDA Mortgage (Lending)",
       "status": "PASS",
       "strategies": {
         "reweighting": {
-          "di_before": 0.7792,
-          "di_after": 0.9262,
+          "di_before": 0.7816,
+          "di_after": 0.9281,
           "eeoc_compliant": true,
           "accuracy_loss": 0.77
         },
         "threshold_adjustment": {
-          "di_before": 0.7792,
-          "di_after": 0.9986,
+          "di_before": 0.7816,
+          "di_after": 0.9972,
           "eeoc_compliant": true,
-          "accuracy_loss": 5.67
+          "accuracy_loss": 5.51
         },
         "feature_removal": {
-          "di_before": 0.7792,
+          "di_before": 0.7816,
           "di_after": 0.9493,
           "eeoc_compliant": true,
           "accuracy_loss": 0.93
         }
       },
-      "load_time": 0.09,
-      "run_time": 3.9
+      "load_time": 0.03,
+      "run_time": 1.79
     }
   },
   "test_cache_generation": {
     "adult": {
       "status": "PASS",
-      "file": "/home/claude/fairlens_day3/backend/app/data/cache/cached_adult.json",
-      "size_kb": 4.7
+      "file": "C:\\Users\\SRISHTI MITTAL\\OneDrive\\Desktop\\FAIR_LENS_GOOGLE_HACKTHON\\backend\\app\\data\\cache\\cached_adult.json",
+      "size_kb": 4.8
     },
     "compas": {
       "status": "PASS",
-      "file": "/home/claude/fairlens_day3/backend/app/data/cache/cached_compas.json",
-      "size_kb": 5.0
+      "file": "C:\\Users\\SRISHTI MITTAL\\OneDrive\\Desktop\\FAIR_LENS_GOOGLE_HACKTHON\\backend\\app\\data\\cache\\cached_compas.json",
+      "size_kb": 5.1
     },
     "hmda": {
       "status": "PASS",
-      "file": "/home/claude/fairlens_day3/backend/app/data/cache/cached_hmda.json",
-      "size_kb": 4.9
+      "file": "C:\\Users\\SRISHTI MITTAL\\OneDrive\\Desktop\\FAIR_LENS_GOOGLE_HACKTHON\\backend\\app\\data\\cache\\cached_hmda.json",
+      "size_kb": 5.1
     }
   },
   "test_demo_simulation": {
     "status": "FAIL",
     "steps": {
-      "sarah_chen_probability": 0.2085,
-      "james_chen_probability": 0.3881,
-      "james_white_probability": 0.3881,
-      "gap_percentage_points": 17.96,
+      "sarah_chen_probability": 0.1867,
+      "james_chen_probability": 0.3931,
+      "james_white_probability": 0.3931,
+      "gap_percentage_points": 20.64,
       "demo_effective": "True"
     },
     "error": "Object of type bool is not JSON serializable"
@@ -160,7 +160,7 @@
     }
   },
   "summary": {
-    "timestamp": "2026-04-24T10:10:23.876319",
+    "timestamp": "2026-04-24T17:45:51.303309",
     "tests_passed": 1,
     "tests_total": 6,
     "overall": "PARTIAL",

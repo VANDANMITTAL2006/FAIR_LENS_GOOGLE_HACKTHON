@@ -1,9 +1,9 @@
 {
-  "sarah_chen_probability": 0.2085,
-  "james_chen_probability": 0.3881,
-  "james_white_probability": 0.3881,
-  "gap_percentage_points": 17.96,
+  "sarah_chen_probability": 0.1867,
+  "james_chen_probability": 0.3931,
+  "james_white_probability": 0.3931,
+  "gap_percentage_points": 20.64,
   "demo_effective": true,
-  "generated_at": "2026-04-24T10:11:36.452376",
-  "note": "Name-swap counterfactual: Same university, same experience, only gender changes. Gap proves algorithmic discrimination."
+  "generated_at": "2026-04-24T17:45:51.000000",
+  "note": "Precomputed demo simulation cache"
 }

@@ -10,74 +10,74 @@
       "description": "Assigns higher training weights to under-represented groups, forcing the model to treat all demographics equally during learning.",
       "how_it_works_simple": "Imagine a classroom where some students are ignored. Reweighting makes the teacher pay MORE attention to those ignored students during training.",
       "accuracy_before": 0.5801,
-      "accuracy_after": 0.5704,
-      "accuracy_loss_pct": 0.97,
+      "accuracy_after": 0.5677,
+      "accuracy_loss_pct": 1.24,
       "fairness_before": {
-        "demographic_parity_diff": 0.216,
-        "disparate_impact": 0.467,
+        "demographic_parity_diff": 0.2141,
+        "disparate_impact": 0.4704,
         "group_positive_rates": {
-          "0": 0.1893,
-          "1": 0.4053
+          "0": 0.1902,
+          "1": 0.4044
         },
-        "gap_percentage_points": 21.6
+        "gap_percentage_points": 21.41
       },
       "fairness_after": {
-        "demographic_parity_diff": 0.0005,
-        "disparate_impact": 0.9984,
+        "demographic_parity_diff": 0.0153,
+        "disparate_impact": 0.9471,
         "group_positive_rates": {
-          "0": 0.2806,
-          "1": 0.2801
+          "0": 0.2891,
+          "1": 0.2738
         },
-        "gap_percentage_points": 0.05
+        "gap_percentage_points": 1.53
       },
-      "fairness_improvement_pct": 21.55,
-      "disparate_impact_gain": 0.5314,
+      "fairness_improvement_pct": 19.88,
+      "disparate_impact_gain": 0.4767,
       "eeoc_compliant_after": true,
       "recommended": true,
-      "tradeoff_summary": "Bias gap reduced by 21.55% pts. Accuracy loss: 0.97% pts."
+      "tradeoff_summary": "Bias gap reduced by 19.88% pts. Accuracy loss: 1.24% pts."
     },
     "threshold_adjustment": {
       "strategy": "Threshold Adjustment",
       "description": "Trains one model but applies different decision thresholds per demographic group, equalising the rate of positive predictions across groups.",
-      "how_it_works_simple": "Like a grading curve \u2014 instead of everyone needing 60% to pass, the teacher adjusts the passing score per group so outcomes are equal.",
+      "how_it_works_simple": "Like a grading curve - instead of everyone needing 60% to pass, the teacher adjusts the passing score per group so outcomes are equal.",
       "accuracy_before": 0.5801,
-      "accuracy_after": 0.5672,
-      "accuracy_loss_pct": 1.29,
+      "accuracy_after": 0.5663,
+      "accuracy_loss_pct": 1.38,
       "group_thresholds": {
-        "0": 0.4324,
-        "1": 0.4872
+        "0": 0.4313,
+        "1": 0.4855
       },
       "fairness_before": {
-        "demographic_parity_diff": 0.216,
-        "disparate_impact": 0.467,
+        "demographic_parity_diff": 0.2141,
+        "disparate_impact": 0.4704,
         "group_positive_rates": {
-          "0": 0.1893,
-          "1": 0.4053
+          "0": 0.1902,
+          "1": 0.4044
         },
-        "gap_percentage_points": 21.6
+        "gap_percentage_points": 21.41
       },
       "fairness_after": {
-        "demographic_parity_diff": 0.0007,
+        "demographic_parity_diff": 0.0008,
         "disparate_impact": 0.9984,
         "group_positive_rates": {
-          "0": 0.468,
-          "1": 0.4687
+          "0": 0.467,
+          "1": 0.4678
         },
-        "gap_percentage_points": 0.07
+        "gap_percentage_points": 0.08
       },
-      "fairness_improvement_pct": 21.53,
-      "disparate_impact_gain": 0.5314,
+      "fairness_improvement_pct": 21.33,
+      "disparate_impact_gain": 0.528,
       "eeoc_compliant_after": true,
       "recommended": true,
-      "tradeoff_summary": "Bias gap reduced by 21.53% pts. Accuracy loss: 1.29% pts."
+      "tradeoff_summary": "Bias gap reduced by 21.33% pts. Accuracy loss: 1.38% pts."
     },
     "feature_removal": {
       "strategy": "Feature Removal",
       "description": "Identifies and removes features that are highly correlated with the protected attribute (proxy features), then retrains the model without them.",
       "how_it_works_simple": "If your model uses 'zipcode' and zipcode is 80% correlated with race, it's sneakily using race. We remove zipcode and all similar hidden proxies.",
       "accuracy_before": 0.5801,
-      "accuracy_after": 0.5815,
-      "accuracy_loss_pct": -0.14,
+      "accuracy_after": 0.5806,
+      "accuracy_loss_pct": -0.05,
       "proxy_features_removed": [
         "decile_score",
         "is_caucasian",
@@ -113,13 +113,13 @@
       "correlation_threshold": 0.2,
       "features_removed_count": 4,
       "fairness_before": {
-        "demographic_parity_diff": 0.216,
-        "disparate_impact": 0.467,
+        "demographic_parity_diff": 0.2141,
+        "disparate_impact": 0.4704,
         "group_positive_rates": {
-          "0": 0.1893,
-          "1": 0.4053
+          "0": 0.1902,
+          "1": 0.4044
         },
-        "gap_percentage_points": 21.6
+        "gap_percentage_points": 21.41
       },
       "fairness_after": {
         "demographic_parity_diff": 0.0769,
@@ -130,13 +130,13 @@
         },
         "gap_percentage_points": 7.69
       },
-      "fairness_improvement_pct": 13.91,
-      "disparate_impact_gain": 0.2975,
+      "fairness_improvement_pct": 13.72,
+      "disparate_impact_gain": 0.2941,
       "eeoc_compliant_after": false,
       "recommended": true,
-      "tradeoff_summary": "4 proxy features removed. Bias gap reduced by 13.91% pts. Accuracy loss: -0.14% pts."
+      "tradeoff_summary": "4 proxy features removed. Bias gap reduced by 13.72% pts. Accuracy loss: -0.05% pts."
     }
   },
-  "recommended_strategy": "reweighting",
-  "summary": "Ran 3 debiasing strategies on COMPAS Recidivism (Criminal Justice). Best recommended: reweighting. All results ready for frontend."
+  "recommended_strategy": "threshold_adjustment",
+  "summary": "Ran 3 debiasing strategies on COMPAS Recidivism (Criminal Justice). Best recommended: threshold_adjustment. All results ready for frontend."
 }

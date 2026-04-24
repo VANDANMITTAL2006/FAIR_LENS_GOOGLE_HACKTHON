@@ -34,14 +34,15 @@ def explain(df: pd.DataFrame) -> dict:
         except Exception:
             pass
             
-    # Deterministic fallback if correlation fails or df is empty
     if not top_features:
-        top_features = [
-            {"feature": "education", "impact": 0.31},
-            {"feature": "experience", "impact": 0.22}
-        ]
-        
+        return {
+            "top_features": [],
+            "group_difference_summary": "Cannot compute feature impacts from available numeric prediction signals.",
+            "status": "cannot_compute",
+        }
+
     return {
         "top_features": top_features,
-        "group_difference_summary": "Features like education and experience drive the majority of the model's predictions."
+        "group_difference_summary": "Feature impacts were computed from observed correlations in the uploaded dataset.",
+        "status": "ok",
     }

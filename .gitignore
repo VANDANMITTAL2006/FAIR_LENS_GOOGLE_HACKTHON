@@ -23,11 +23,8 @@ frontend/node_modules/
 .DS_Store
 Thumbs.db
 
-# Local data and logs (keep dataset folder if needed)
+# Local data and logs
 *.log
-
-# FairLens cache artifacts
-data/cached_*.json
-
-# Optional: ignore local datasets
-data/*.csv
+app/data/
+backend/app/data/
+data/

@@ -23,19 +23,24 @@ def _base_contract(dataset_name: str = "uploaded_file") -> dict:
         "status": "failed",
         "dataset_name": dataset_name,
         "protected_attributes": [],
+        "primary_protected": None,
         "risk_level": "Unknown",
         "plain_english_summary": "",
         "metrics": METRIC_DEFAULTS.copy(),
         "group_metrics": {},
+        "group_comparison": [],
         "disparate_impact": 1.0,
         "statistical_parity_diff": 0.0,
         "equalized_odds_diff": 0.0,
         "predictive_parity_diff": 0.0,
         "eeoc_threshold_breach": False,
         "top_shap_features": [],
+        "shap_data": {"top_features": [], "group_difference_summary": "", "status": "skipped"},
         "group_difference_summary": "",
         "counterfactual": {},
+        "counterfactual_data": {},
         "regulatory_violations": [],
+        "regulatory_flags": [],
         "component_status": {
             "audit": "failed",
             "shap": "skipped",
@@ -86,6 +91,15 @@ def _validate_audit_result(raw: object, contract: dict) -> bool:
 
     contract["metrics"] = validated_metrics
     contract["group_metrics"] = group_metrics
+    contract["group_comparison"] = [
+        {
+            "group": group_name,
+            "selection_rate": values.get("selection_rate"),
+            "sample_size": values.get("sample_size"),
+        }
+        for group_name, values in group_metrics.items()
+        if isinstance(values, dict)
+    ]
     contract["risk_level"] = str(raw.get("risk_level") or "Unknown")
     contract["plain_english_summary"] = str(raw.get("plain_english_summary") or "")
 
@@ -115,6 +129,58 @@ def _resolve_dataset_key(dataset_name: str) -> str:
     return key
 
 
+def _transform_precomputed_to_contract(payload: dict, dataset_name: str) -> dict | None:
+    if "strategies" not in payload:
+        return None
+
+    strategy_key = payload.get("recommended_strategy")
+    if not strategy_key or strategy_key not in payload.get("strategies", {}):
+        strategies = payload.get("strategies", {})
+        strategy_key = next(iter(strategies.keys()), None)
+    if not strategy_key:
+        return None
+
+    chosen = payload["strategies"].get(strategy_key, {})
+    fairness_before = chosen.get("fairness_before", {})
+    group_rates = fairness_before.get("group_positive_rates", {})
+
+    contract = _base_contract(dataset_name=dataset_name)
+    contract["metrics"] = {
+        "demographic_parity_difference": _as_float(fairness_before.get("demographic_parity_diff", 0.0), 0.0),
+        "equalized_odds_difference": 0.0,
+        "predictive_parity_diff": 0.0,
+        "disparate_impact_ratio": _as_float(fairness_before.get("disparate_impact", 1.0), 1.0),
+    }
+    contract["disparate_impact"] = contract["metrics"]["disparate_impact_ratio"]
+    contract["statistical_parity_diff"] = contract["metrics"]["demographic_parity_difference"]
+    contract["equalized_odds_diff"] = 0.0
+    contract["predictive_parity_diff"] = 0.0
+    contract["eeoc_threshold_breach"] = contract["disparate_impact"] < 0.8
+    contract["risk_level"] = "High" if contract["eeoc_threshold_breach"] else "Low"
+    contract["plain_english_summary"] = (
+        f"Using precomputed fallback from {dataset_name}; derived from debiasing fairness baseline."
+    )
+    contract["group_metrics"] = {
+        str(group): {
+            "selection_rate": _as_float(rate, 0.0),
+            "sample_size": 0,
+        }
+        for group, rate in group_rates.items()
+    }
+    contract["group_comparison"] = [
+        {"group": g, "selection_rate": v.get("selection_rate"), "sample_size": 0}
+        for g, v in contract["group_metrics"].items()
+    ]
+    contract["warnings"].append("fallback transformed from precomputed debias cache")
+    contract["component_status"]["audit"] = "fallback"
+    contract["component_status"]["cache"] = "hit"
+    contract["component_status"]["shap"] = "skipped"
+    contract["component_status"]["counterfactual"] = "skipped"
+    contract["component_status"]["regulatory"] = "ok"
+    contract["status"] = "partial"
+    return contract
+
+
 def load_cached_audit(dataset_name: str) -> dict | None:
     key = _resolve_dataset_key(dataset_name)
     if not key:
@@ -134,11 +200,18 @@ def load_cached_audit(dataset_name: str) -> dict | None:
         return None
 
     contract = _base_contract(dataset_name=key)
-    _validate_audit_result(payload, contract)
-    contract["component_status"]["cache"] = "hit"
-    contract["component_status"]["audit"] = "ok"
-    contract["status"] = "ok"
-    return contract
+    if _validate_audit_result(payload, contract):
+        contract["component_status"]["cache"] = "hit"
+        contract["component_status"]["audit"] = "ok"
+        contract["status"] = "ok"
+        return contract
+
+    transformed = _transform_precomputed_to_contract(payload, key)
+    if transformed is not None:
+        transformed["component_status"]["cache"] = "hit"
+        return transformed
+
+    return None
 
 
 def build_failure_contract(message: str, detail: str = "", dataset_name: str = "uploaded_file", cached: bool = False, fast: bool = False) -> dict:
@@ -160,12 +233,21 @@ def run_full_audit(df: pd.DataFrame, dataset_name: str = "uploaded_file", fast_m
 
     try:
         audit_result = audit(df)
-        is_valid = _validate_audit_result(audit_result, contract)
-        contract["component_status"]["audit"] = "ok" if is_valid else "fallback"
+        if isinstance(audit_result, dict) and audit_result.get("success") is False:
+            contract["warnings"].append(f"audit failed: {audit_result.get('error')}")
+            contract["component_status"]["audit"] = "failed"
+            contract["plain_english_summary"] = audit_result.get("error", "Audit failed; fallback defaults used.")
+            if "protected_attributes" in audit_result:
+                contract["protected_attributes"] = audit_result["protected_attributes"]
+        else:
+            is_valid = _validate_audit_result(audit_result, contract)
+            contract["component_status"]["audit"] = "ok" if is_valid else "fallback"
+            if isinstance(audit_result, dict) and "primary_protected" in audit_result:
+                contract["primary_protected"] = audit_result["primary_protected"]
     except Exception as exc:
-        contract["warnings"].append(f"audit failed: {exc}")
+        contract["warnings"].append(f"audit execution error: {exc}")
         contract["component_status"]["audit"] = "failed"
-        contract["plain_english_summary"] = "Audit failed; fallback defaults used."
+        contract["plain_english_summary"] = "Audit execution failed; fallback defaults used."
 
     if fast_mode:
         contract["component_status"]["shap"] = "skipped"
@@ -179,7 +261,8 @@ def run_full_audit(df: pd.DataFrame, dataset_name: str = "uploaded_file", fast_m
                 top_features = shap_result.get("top_features", [])
                 contract["top_shap_features"] = top_features if isinstance(top_features, list) else []
                 contract["group_difference_summary"] = str(shap_result.get("group_difference_summary", ""))
-                contract["component_status"]["shap"] = "ok"
+                contract["shap_data"] = shap_result
+                contract["component_status"]["shap"] = "ok" if shap_result.get("status") == "ok" else "failed"
             else:
                 contract["warnings"].append("shap output invalid; defaults used")
                 contract["component_status"]["shap"] = "failed"
@@ -191,7 +274,8 @@ def run_full_audit(df: pd.DataFrame, dataset_name: str = "uploaded_file", fast_m
             counterfactual_result = get_counterfactual(df)
             if isinstance(counterfactual_result, dict):
                 contract["counterfactual"] = counterfactual_result
-                contract["component_status"]["counterfactual"] = "ok"
+                contract["counterfactual_data"] = counterfactual_result
+                contract["component_status"]["counterfactual"] = "ok" if counterfactual_result.get("status") == "ok" else "failed"
             else:
                 contract["warnings"].append("counterfactual output invalid; default {} used")
                 contract["component_status"]["counterfactual"] = "failed"
@@ -204,6 +288,7 @@ def run_full_audit(df: pd.DataFrame, dataset_name: str = "uploaded_file", fast_m
             if isinstance(violations_result, dict):
                 violations = violations_result.get("violations", [])
                 contract["regulatory_violations"] = violations if isinstance(violations, list) else []
+                contract["regulatory_flags"] = contract["regulatory_violations"]
                 contract["component_status"]["regulatory"] = "ok"
             else:
                 contract["warnings"].append("regulatory output invalid; default [] used")

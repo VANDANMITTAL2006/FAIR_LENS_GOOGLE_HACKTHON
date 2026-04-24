@@ -23,7 +23,9 @@ The backend is organized as:
 
 - Accepts CSV and JSON uploads and converts them into pandas DataFrames.
 - Detects protected or proxy-sensitive attributes such as age, gender, race, and zipcode.
+- Computes 4 fairness metrics from real labels/predictions (no random fallback).
 - Returns a stable fairness audit JSON contract for the frontend dashboard.
+- Provides debias strategy execution through `POST /api/debias`.
 - Exposes a health endpoint for uptime checks.
 
 ## Run the Backend
@@ -31,8 +33,8 @@ The backend is organized as:
 From the repository root:
 
 ```bash
-pip install -r backend/requirements.txt
-uvicorn backend.app.main:app --host 127.0.0.1 --port 8000
+pip install -r requirements.txt
+uvicorn main:app --host 127.0.0.1 --port 8000
 ```
 
 ## Run the Frontend
@@ -52,5 +54,5 @@ npm run dev
 
 ## Notes
 
-- The audit endpoint currently returns stubbed metrics with a fixed response shape.
-- The current folder layout now matches the requested `backend/app` structure.
+- Frontend flow is `upload -> audit -> debias` via `frontend/src/services/api.js`.
+- `/audit` supports `upload_id` references returned by `/upload`.
