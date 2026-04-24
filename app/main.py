@@ -1,5 +1,6 @@
-﻿import asyncio
+import asyncio
 import json
+import sys
 from pathlib import Path
 
 from fastapi import FastAPI
@@ -11,6 +12,13 @@ from app.core.settings import settings
 from app.modules.stream_steps import AUDIT_STEPS
 from app.routers import audit_router, upload_router
 from app.utils.responses import error, success
+from backend.app.api.debias_route import router as debias_router
+
+# Configure stdout encoding for Windows compatibility
+try:
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+except AttributeError:
+    pass
 
 app = FastAPI(title=settings.app_name)
 
@@ -23,6 +31,7 @@ app.add_middleware(
 
 app.include_router(upload_router)
 app.include_router(audit_router)
+app.include_router(debias_router)
 
 
 @app.get("/audit-stream")

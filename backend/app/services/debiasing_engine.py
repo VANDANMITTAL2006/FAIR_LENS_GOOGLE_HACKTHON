@@ -1,14 +1,14 @@
 """
-FairLens — Debiasing Recommendation Engine
+FairLens - Debiasing Recommendation Engine
 ===========================================
 Person D Deliverable | Day 2
 
 This module provides 3 debiasing strategies:
-  1. Reweighting          — assign sample weights so minority groups count more in training
-  2. Threshold Adjustment — use different decision cutoffs per group to equalise outcomes
-  3. Feature Removal      — drop the most discriminatory proxy features
+  1. Reweighting          - assign sample weights so minority groups count more in training
+  2. Threshold Adjustment - use different decision cutoffs per group to equalise outcomes
+  3. Feature Removal      - drop the most discriminatory proxy features
 
-Usage (by Person A — FastAPI integration):
+Usage (by Person A - FastAPI integration):
     from app.services.debiasing_engine import run_all_strategies
     result = run_all_strategies(df, label_col, protected_col, privileged_group)
 
@@ -18,6 +18,7 @@ Usage (standalone, run from repo root):
 
 import json
 import warnings
+import sys
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
@@ -28,9 +29,15 @@ from typing import Optional
 
 warnings.filterwarnings("ignore")
 
-# ─────────────────────────────────────────────────────────────────
+# Configure stdout encoding for Windows compatibility
+try:
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+except AttributeError:
+    pass
+
+# -----------------------------------------------------------------
 # UTILITY HELPERS
-# ─────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------
 
 def _encode_dataframe(df: pd.DataFrame, label_col: str) -> tuple:
     """
@@ -102,9 +109,9 @@ def _get_protected_col_idx(feature_names: list, protected_col: str) -> Optional[
     return None
 
 
-# ─────────────────────────────────────────────────────────────────
-# STRATEGY 1 — REWEIGHTING
-# ─────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------
+# STRATEGY 1 - REWEIGHTING
+# -----------------------------------------------------------------
 
 def strategy_reweighting(
     df: pd.DataFrame,
@@ -118,14 +125,14 @@ def strategy_reweighting(
 
     Logic:
       w_i = (P(Y) * P(A)) / P(Y, A)
-      Under-represented group + positive label → higher weight
-      Over-represented group + positive label → lower weight
+      Under-represented group + positive label -> higher weight
+      Over-represented group + positive label -> lower weight
 
     This is the standard AIF360 / Kamiran & Calders (2012) reweighting approach.
     """
     strategy_name = "Reweighting"
 
-    # ── Prepare data
+    # -- Prepare data
     df_work = df.copy().dropna(subset=[label_col, protected_col])
     X, y, feature_names = _encode_dataframe(df_work, label_col)
 
@@ -135,11 +142,11 @@ def strategy_reweighting(
     X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=0.3, random_state=42)
     groups_te = X_te[:, prot_idx] if prot_idx is not None else np.zeros(len(y_te))
 
-    # ── Baseline (no weights)
+    # -- Baseline (no weights)
     _, _, preds_base, acc_before = _train_baseline(X_tr, y_tr, X_te, y_te)
     fair_before = _compute_fairness_metrics(y_te, preds_base, groups_te)
 
-    # ── Compute reweighting sample weights on training set
+    # -- Compute reweighting sample weights on training set
     groups_tr = X_tr[:, prot_idx] if prot_idx is not None else np.zeros(len(y_tr))
 
     n = len(y_tr)
@@ -161,11 +168,11 @@ def strategy_reweighting(
     # Clip extreme weights to prevent instability
     weights = np.clip(weights, 0.1, 10.0)
 
-    # ── Train with weights
+    # -- Train with weights
     _, _, preds_after, acc_after = _train_baseline(X_tr, y_tr, X_te, y_te, sample_weight=weights)
     fair_after = _compute_fairness_metrics(y_te, preds_after, groups_te)
 
-    # ── Accuracy tradeoff
+    # -- Accuracy tradeoff
     acc_loss = round((acc_before - acc_after) * 100, 2)
     dp_gain  = round((fair_before["demographic_parity_diff"] - fair_after["demographic_parity_diff"]) * 100, 2)
     di_gain  = round(fair_after["disparate_impact"] - fair_before["disparate_impact"], 4)
@@ -197,9 +204,9 @@ def strategy_reweighting(
     }
 
 
-# ─────────────────────────────────────────────────────────────────
-# STRATEGY 2 — THRESHOLD ADJUSTMENT
-# ─────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------
+# STRATEGY 2 - THRESHOLD ADJUSTMENT
+# -----------------------------------------------------------------
 
 def strategy_threshold_adjustment(
     df: pd.DataFrame,
@@ -217,7 +224,7 @@ def strategy_threshold_adjustment(
       - We find group-specific thresholds that equalise positive rates
       - This is done via binary search per group on the validation set
 
-    Simple but highly effective — used in production at many companies.
+    Simple but highly effective - used in production at many companies.
     """
     strategy_name = "Threshold Adjustment"
 
@@ -228,14 +235,14 @@ def strategy_threshold_adjustment(
     X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=0.3, random_state=42)
     groups_te = X_te[:, prot_idx] if prot_idx is not None else np.zeros(len(y_te))
 
-    # ── Baseline
+    # -- Baseline
     clf, proba_te, preds_base, acc_before = _train_baseline(X_tr, y_tr, X_te, y_te)
     fair_before = _compute_fairness_metrics(y_te, preds_base, groups_te)
 
-    # ── Find target positive rate (use overall positive rate as target)
+    # -- Find target positive rate (use overall positive rate as target)
     overall_pos_rate = y_te.mean()
 
-    # ── Adjust thresholds per group
+    # -- Adjust thresholds per group
     unique_groups = np.unique(groups_te)
     group_thresholds = {}
     preds_adjusted = preds_base.copy()
@@ -247,10 +254,10 @@ def strategy_threshold_adjustment(
             continue
 
         group_proba = proba_te[mask]
-        # Binary search: find threshold t such that (proba >= t).mean() ≈ overall_pos_rate
+        # Binary search: find threshold t such that (proba >= t).mean() ~ overall_pos_rate
         lo, hi = 0.0, 1.0
         best_t = 0.5
-        for _ in range(50):   # 50 iterations of binary search → very precise
+        for _ in range(50):   # 50 iterations of binary search -> very precise
             mid = (lo + hi) / 2.0
             rate = (group_proba >= mid).mean()
             if rate > overall_pos_rate:
@@ -272,7 +279,7 @@ def strategy_threshold_adjustment(
     return {
         "strategy":              strategy_name,
         "description":           "Trains one model but applies different decision thresholds per demographic group, equalising the rate of positive predictions across groups.",
-        "how_it_works_simple":   "Like a grading curve — instead of everyone needing 60% to pass, the teacher adjusts the passing score per group so outcomes are equal.",
+        "how_it_works_simple":   "Like a grading curve - instead of everyone needing 60% to pass, the teacher adjusts the passing score per group so outcomes are equal.",
         "accuracy_before":       acc_before,
         "accuracy_after":        acc_after,
         "accuracy_loss_pct":     acc_loss,
@@ -297,9 +304,9 @@ def strategy_threshold_adjustment(
     }
 
 
-# ─────────────────────────────────────────────────────────────────
-# STRATEGY 3 — FEATURE REMOVAL
-# ─────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------
+# STRATEGY 3 - FEATURE REMOVAL
+# -----------------------------------------------------------------
 
 def strategy_feature_removal(
     df: pd.DataFrame,
@@ -317,8 +324,8 @@ def strategy_feature_removal(
       - Remove features with |correlation| > threshold (default 0.2)
       - Retrain model without those proxy features
 
-    Example: 'zipcode' correlates with race → remove it.
-             'career_gap_months' correlates with sex → remove it.
+    Example: 'zipcode' correlates with race -> remove it.
+             'career_gap_months' correlates with sex -> remove it.
     """
     strategy_name = "Feature Removal"
 
@@ -329,11 +336,11 @@ def strategy_feature_removal(
     X_tr, X_te, y_tr, y_te = train_test_split(X_full, y, test_size=0.3, random_state=42)
     groups_te = X_te[:, prot_idx] if prot_idx is not None else np.zeros(len(y_te))
 
-    # ── Baseline with all features
+    # -- Baseline with all features
     _, _, preds_base, acc_before = _train_baseline(X_tr, y_tr, X_te, y_te)
     fair_before = _compute_fairness_metrics(y_te, preds_base, groups_te)
 
-    # ── Find proxy features (correlated with protected attribute)
+    # -- Find proxy features (correlated with protected attribute)
     CORR_THRESHOLD = 0.20   # features with |corr| > this are dropped
     proxy_features = []
     kept_features  = []
@@ -360,7 +367,7 @@ def strategy_feature_removal(
     if protected_col in kept_features:
         kept_features.remove(protected_col)
 
-    # ── Rebuild feature matrix without proxy features
+    # -- Rebuild feature matrix without proxy features
     keep_idx = [i for i, f in enumerate(feature_names) if f in kept_features]
 
     if len(keep_idx) == 0:
@@ -370,7 +377,7 @@ def strategy_feature_removal(
     X_tr_reduced = X_tr[:, keep_idx]
     X_te_reduced = X_te[:, keep_idx]
 
-    # ── Retrain without proxy features
+    # -- Retrain without proxy features
     # Recalculate groups (prot_idx may shift if prot col is in features)
     # Use original groups_te calculated before
     _, _, preds_after, acc_after = _train_baseline(X_tr_reduced, y_tr, X_te_reduced, y_te)
@@ -415,9 +422,9 @@ def strategy_feature_removal(
     }
 
 
-# ─────────────────────────────────────────────────────────────────
-# MAIN FUNCTION — runs all 3 strategies, returns combined JSON
-# ─────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------
+# MAIN FUNCTION - runs all 3 strategies, returns combined JSON
+# -----------------------------------------------------------------
 
 def run_all_strategies(
     df: pd.DataFrame,
@@ -439,11 +446,14 @@ def run_all_strategies(
     Returns:
         dict with all 3 strategy results + metadata
     """
-    print(f"\n{'='*60}")
-    print(f"Running debiasing on: {dataset_name}")
-    print(f"Label: {label_col} | Protected: {protected_col} | Privileged: {privileged_group}")
-    print(f"Dataset shape: {df.shape}")
-    print("="*60)
+    try:
+        print(f"\n{'='*60}")
+        print(f"Running debiasing on: {dataset_name}")
+        print(f"Label: {label_col} | Protected: {protected_col} | Privileged: {privileged_group}")
+        print(f"Dataset shape: {df.shape}")
+        print("="*60)
+    except UnicodeEncodeError:
+        pass
 
     results = {"dataset": dataset_name, "label_col": label_col,
                "protected_col": protected_col, "privileged_group": privileged_group,
@@ -454,15 +464,24 @@ def run_all_strategies(
         (strategy_threshold_adjustment, "threshold_adjustment"),
         (strategy_feature_removal,      "feature_removal"),
     ]:
-        print(f"\n  ▶ Running {name}...")
+        try:
+            print(f"\n  > Running {name}...")
+        except UnicodeEncodeError:
+            pass
         try:
             result = strategy_fn(df, label_col, protected_col, privileged_group)
             results["strategies"][name] = result
-            print(f"    Accuracy: {result['accuracy_before']} → {result['accuracy_after']}  "
-                  f"| DI: {result['fairness_before']['disparate_impact']} → {result['fairness_after']['disparate_impact']}  "
-                  f"| EEOC: {'✅' if result['eeoc_compliant_after'] else '❌'}")
+            try:
+                print(f"    Accuracy: {result['accuracy_before']} -> {result['accuracy_after']}  "
+                      f"| DI: {result['fairness_before']['disparate_impact']} -> {result['fairness_after']['disparate_impact']}  "
+                      f"| EEOC: {'OK' if result['eeoc_compliant_after'] else 'FAIL'}")
+            except UnicodeEncodeError:
+                pass
         except Exception as e:
-            print(f"    ⚠ Error: {e}")
+            try:
+                print(f"    ! Error: {e}")
+            except UnicodeEncodeError:
+                pass
             results["strategies"][name] = {"error": str(e), "strategy": name}
 
     # Best strategy = highest DI gain with least accuracy loss
@@ -484,9 +503,9 @@ def run_all_strategies(
     return results
 
 
-# ─────────────────────────────────────────────────────────────────
-# STANDALONE RUNNER — called when you run `python debiasing_engine.py`
-# ─────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------
+# STANDALONE RUNNER - called when you run `python debiasing_engine.py`
+# -----------------------------------------------------------------
 
 if __name__ == "__main__":
     import os
@@ -519,7 +538,7 @@ if __name__ == "__main__":
             "protected_col":    "race_black",
             "privileged_group": "0",
             "filter":           {"action_taken": [1, 3]},
-            "remap_label":      {1: 1, 3: 0},   # 1=approved → 1, 3=denied → 0
+            "remap_label":      {1: 1, 3: 0},   # 1=approved -> 1, 3=denied -> 0
         },
     ]
 
@@ -528,7 +547,10 @@ if __name__ == "__main__":
     for cfg in DATASETS:
         fpath = os.path.join(DATA_DIR, cfg["file"])
         if not os.path.exists(fpath):
-            print(f"⚠ File not found: {fpath} — skipping")
+            try:
+                print(f"! File not found: {fpath} - skipping")
+            except UnicodeEncodeError:
+                pass
             continue
 
         df = pd.read_csv(fpath)
@@ -557,13 +579,19 @@ if __name__ == "__main__":
         out_path  = os.path.join(OUT_DIR, f"{safe_name}_debiasing.json")
         with open(out_path, "w") as f:
             json.dump(result, f, indent=2)
-        print(f"\n  ✅ Saved → {out_path}")
+        try:
+            print(f"\n  OK Saved -> {out_path}")
+        except UnicodeEncodeError:
+            pass
 
     # Save combined JSON for frontend
     combined_path = os.path.join(OUT_DIR, "all_datasets_debiasing.json")
     with open(combined_path, "w") as f:
         json.dump(all_results, f, indent=2)
-    print(f"\n{'='*60}")
-    print(f"✅ ALL DONE — combined output saved to:")
-    print(f"   {combined_path}")
-    print("="*60)
+    try:
+        print(f"\n{'='*60}")
+        print(f"OK ALL DONE - combined output saved to:")
+        print(f"   {combined_path}")
+        print("="*60)
+    except UnicodeEncodeError:
+        pass
