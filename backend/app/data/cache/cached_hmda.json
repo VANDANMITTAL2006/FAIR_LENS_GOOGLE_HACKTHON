@@ -1,0 +1,139 @@
+{
+  "dataset": "HUD HMDA Mortgage (Lending)",
+  "label_col": "action_taken",
+  "protected_col": "race_black",
+  "privileged_group": "0",
+  "n_rows": 8162,
+  "strategies": {
+    "reweighting": {
+      "strategy": "Reweighting",
+      "description": "Assigns higher training weights to under-represented groups, forcing the model to treat all demographics equally during learning.",
+      "how_it_works_simple": "Imagine a classroom where some students are ignored. Reweighting makes the teacher pay MORE attention to those ignored students during training.",
+      "accuracy_before": 0.7472,
+      "accuracy_after": 0.7395,
+      "accuracy_loss_pct": 0.77,
+      "fairness_before": {
+        "demographic_parity_diff": 0.2102,
+        "disparate_impact": 0.7792,
+        "group_positive_rates": {
+          "0.0": 0.9522,
+          "1.0": 0.742
+        },
+        "gap_percentage_points": 21.02
+      },
+      "fairness_after": {
+        "demographic_parity_diff": 0.0738,
+        "disparate_impact": 0.9262,
+        "group_positive_rates": {
+          "0.0": 0.9262,
+          "1.0": 1.0
+        },
+        "gap_percentage_points": 7.38
+      },
+      "fairness_improvement_pct": 13.64,
+      "disparate_impact_gain": 0.147,
+      "eeoc_compliant_after": true,
+      "recommended": true,
+      "tradeoff_summary": "Bias gap reduced by 13.64% pts. Accuracy loss: 0.77% pts."
+    },
+    "threshold_adjustment": {
+      "strategy": "Threshold Adjustment",
+      "description": "Trains one model but applies different decision thresholds per demographic group, equalising the rate of positive predictions across groups.",
+      "how_it_works_simple": "Like a grading curve \u2014 instead of everyone needing 60% to pass, the teacher adjusts the passing score per group so outcomes are equal.",
+      "accuracy_before": 0.7472,
+      "accuracy_after": 0.6905,
+      "accuracy_loss_pct": 5.67,
+      "group_thresholds": {
+        "0": 0.7215,
+        "1": 0.5035
+      },
+      "fairness_before": {
+        "demographic_parity_diff": 0.2102,
+        "disparate_impact": 0.7792,
+        "group_positive_rates": {
+          "0.0": 0.9522,
+          "1.0": 0.742
+        },
+        "gap_percentage_points": 21.02
+      },
+      "fairness_after": {
+        "demographic_parity_diff": 0.0011,
+        "disparate_impact": 0.9986,
+        "group_positive_rates": {
+          "0.0": 0.7356,
+          "1.0": 0.7367
+        },
+        "gap_percentage_points": 0.11
+      },
+      "fairness_improvement_pct": 20.91,
+      "disparate_impact_gain": 0.2194,
+      "eeoc_compliant_after": true,
+      "recommended": true,
+      "tradeoff_summary": "Bias gap reduced by 20.91% pts. Accuracy loss: 5.67% pts."
+    },
+    "feature_removal": {
+      "strategy": "Feature Removal",
+      "description": "Identifies and removes features that are highly correlated with the protected attribute (proxy features), then retrains the model without them.",
+      "how_it_works_simple": "If your model uses 'zipcode' and zipcode is 80% correlated with race, it's sneakily using race. We remove zipcode and all similar hidden proxies.",
+      "accuracy_before": 0.7472,
+      "accuracy_after": 0.7379,
+      "accuracy_loss_pct": 0.93,
+      "proxy_features_removed": [
+        "loan_amount_000s",
+        "applicant_income_000s",
+        "census_tract_minority_pct",
+        "race_white",
+        "race_black"
+      ],
+      "features_kept": [
+        "county_code",
+        "debt_to_income_ratio",
+        "combined_loan_to_value",
+        "sex_binary",
+        "race_hispanic",
+        "hoepa_binary",
+        "loan_type_code",
+        "loan_purpose_code"
+      ],
+      "proxy_correlation_scores": {
+        "race_white": 0.5391,
+        "census_tract_minority_pct": 0.4896,
+        "applicant_income_000s": 0.238,
+        "loan_amount_000s": 0.2174,
+        "race_hispanic": 0.1776,
+        "debt_to_income_ratio": 0.1462,
+        "combined_loan_to_value": 0.0144,
+        "sex_binary": 0.0139,
+        "county_code": 0.0078,
+        "loan_purpose_code": 0.0077
+      },
+      "correlation_threshold": 0.2,
+      "features_removed_count": 5,
+      "fairness_before": {
+        "demographic_parity_diff": 0.2102,
+        "disparate_impact": 0.7792,
+        "group_positive_rates": {
+          "0.0": 0.9522,
+          "1.0": 0.742
+        },
+        "gap_percentage_points": 21.02
+      },
+      "fairness_after": {
+        "demographic_parity_diff": 0.0507,
+        "disparate_impact": 0.9493,
+        "group_positive_rates": {
+          "0.0": 0.9493,
+          "1.0": 1.0
+        },
+        "gap_percentage_points": 5.07
+      },
+      "fairness_improvement_pct": 15.95,
+      "disparate_impact_gain": 0.1701,
+      "eeoc_compliant_after": true,
+      "recommended": true,
+      "tradeoff_summary": "5 proxy features removed. Bias gap reduced by 15.95% pts. Accuracy loss: 0.93% pts."
+    }
+  },
+  "recommended_strategy": "threshold_adjustment",
+  "summary": "Ran 3 debiasing strategies on HUD HMDA Mortgage (Lending). Best recommended: threshold_adjustment. All results ready for frontend."
+}

@@ -1,0 +1,133 @@
+{
+  "dataset": "UCI Adult Income (HR / Hiring)",
+  "label_col": "income_binary",
+  "protected_col": "sex_binary",
+  "privileged_group": "1",
+  "n_rows": 9994,
+  "strategies": {
+    "reweighting": {
+      "strategy": "Reweighting",
+      "description": "Assigns higher training weights to under-represented groups, forcing the model to treat all demographics equally during learning.",
+      "how_it_works_simple": "Imagine a classroom where some students are ignored. Reweighting makes the teacher pay MORE attention to those ignored students during training.",
+      "accuracy_before": 0.6936,
+      "accuracy_after": 0.6819,
+      "accuracy_loss_pct": 1.17,
+      "fairness_before": {
+        "demographic_parity_diff": 0.1432,
+        "disparate_impact": 0.0,
+        "group_positive_rates": {
+          "0.0": 0.0,
+          "1.0": 0.1432
+        },
+        "gap_percentage_points": 14.32
+      },
+      "fairness_after": {
+        "demographic_parity_diff": 0.0041,
+        "disparate_impact": 0.8758,
+        "group_positive_rates": {
+          "0.0": 0.0327,
+          "1.0": 0.0286
+        },
+        "gap_percentage_points": 0.41
+      },
+      "fairness_improvement_pct": 13.91,
+      "disparate_impact_gain": 0.8758,
+      "eeoc_compliant_after": true,
+      "recommended": true,
+      "tradeoff_summary": "Bias gap reduced by 13.91% pts. Accuracy loss: 1.17% pts."
+    },
+    "threshold_adjustment": {
+      "strategy": "Threshold Adjustment",
+      "description": "Trains one model but applies different decision thresholds per demographic group, equalising the rate of positive predictions across groups.",
+      "how_it_works_simple": "Like a grading curve \u2014 instead of everyone needing 60% to pass, the teacher adjusts the passing score per group so outcomes are equal.",
+      "accuracy_before": 0.6936,
+      "accuracy_after": 0.6379,
+      "accuracy_loss_pct": 5.57,
+      "group_thresholds": {
+        "0": 0.239,
+        "1": 0.4253
+      },
+      "fairness_before": {
+        "demographic_parity_diff": 0.1432,
+        "disparate_impact": 0.0,
+        "group_positive_rates": {
+          "0.0": 0.0,
+          "1.0": 0.1432
+        },
+        "gap_percentage_points": 14.32
+      },
+      "fairness_after": {
+        "demographic_parity_diff": 0.0006,
+        "disparate_impact": 0.9982,
+        "group_positive_rates": {
+          "0.0": 0.329,
+          "1.0": 0.3296
+        },
+        "gap_percentage_points": 0.06
+      },
+      "fairness_improvement_pct": 14.26,
+      "disparate_impact_gain": 0.9982,
+      "eeoc_compliant_after": true,
+      "recommended": true,
+      "tradeoff_summary": "Bias gap reduced by 14.26% pts. Accuracy loss: 5.57% pts."
+    },
+    "feature_removal": {
+      "strategy": "Feature Removal",
+      "description": "Identifies and removes features that are highly correlated with the protected attribute (proxy features), then retrains the model without them.",
+      "how_it_works_simple": "If your model uses 'zipcode' and zipcode is 80% correlated with race, it's sneakily using race. We remove zipcode and all similar hidden proxies.",
+      "accuracy_before": 0.6936,
+      "accuracy_after": 0.6809,
+      "accuracy_loss_pct": 1.27,
+      "proxy_features_removed": [
+        "sex_binary"
+      ],
+      "features_kept": [
+        "age",
+        "education_num",
+        "capital_gain",
+        "capital_loss",
+        "hours_per_week",
+        "is_married",
+        "capital_gain_log",
+        "capital_loss_log"
+      ],
+      "proxy_correlation_scores": {
+        "capital_gain_log": 0.0187,
+        "hours_per_week": 0.0155,
+        "capital_gain": 0.015,
+        "age": 0.0146,
+        "is_married": 0.0076,
+        "education_num": 0.005,
+        "capital_loss": 0.0034,
+        "capital_loss_log": 0.0022
+      },
+      "correlation_threshold": 0.2,
+      "features_removed_count": 1,
+      "fairness_before": {
+        "demographic_parity_diff": 0.1432,
+        "disparate_impact": 0.0,
+        "group_positive_rates": {
+          "0.0": 0.0,
+          "1.0": 0.1432
+        },
+        "gap_percentage_points": 14.32
+      },
+      "fairness_after": {
+        "demographic_parity_diff": 0.0056,
+        "disparate_impact": 0.8178,
+        "group_positive_rates": {
+          "0.0": 0.0307,
+          "1.0": 0.0251
+        },
+        "gap_percentage_points": 0.56
+      },
+      "fairness_improvement_pct": 13.76,
+      "disparate_impact_gain": 0.8178,
+      "eeoc_compliant_after": true,
+      "recommended": false,
+      "tradeoff_summary": "1 proxy features removed. Bias gap reduced by 13.76% pts. Accuracy loss: 1.27% pts."
+    }
+  },
+  "recommended_strategy": "threshold_adjustment",
+  "summary": "Ran 3 debiasing strategies on UCI Adult Income (HR / Hiring). Best recommended: threshold_adjustment. All results ready for frontend."
+}

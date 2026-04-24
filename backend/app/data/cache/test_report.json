@@ -1,0 +1,169 @@
+{
+  "test_csv_files": {
+    "adult": {
+      "file": "adult_cleaned.csv",
+      "status": "PASS",
+      "rows": 9994,
+      "cols": 20,
+      "missing_required_cols": [],
+      "missing_values_total": 0
+    },
+    "compas": {
+      "file": "compas_cleaned.csv",
+      "status": "PASS",
+      "rows": 7214,
+      "cols": 23,
+      "missing_required_cols": [],
+      "missing_values_total": 0
+    },
+    "hmda": {
+      "file": "hmda_cleaned.csv",
+      "status": "PASS",
+      "rows": 10000,
+      "cols": 23,
+      "missing_required_cols": [],
+      "missing_values_total": 0
+    }
+  },
+  "test_debiasing_import": {
+    "status": "PASS",
+    "functions_found": [
+      "run_all_strategies",
+      "strategy_reweighting",
+      "strategy_threshold_adjustment",
+      "strategy_feature_removal"
+    ]
+  },
+  "test_full_pipeline": {
+    "adult": {
+      "dataset": "UCI Adult Income (HR / Hiring)",
+      "status": "PASS",
+      "strategies": {
+        "reweighting": {
+          "di_before": 0.0,
+          "di_after": 0.8758,
+          "eeoc_compliant": true,
+          "accuracy_loss": 1.17
+        },
+        "threshold_adjustment": {
+          "di_before": 0.0,
+          "di_after": 0.9982,
+          "eeoc_compliant": true,
+          "accuracy_loss": 5.57
+        },
+        "feature_removal": {
+          "di_before": 0.0,
+          "di_after": 0.8178,
+          "eeoc_compliant": true,
+          "accuracy_loss": 1.27
+        }
+      },
+      "load_time": 0.05,
+      "run_time": 5.43
+    },
+    "compas": {
+      "dataset": "COMPAS Recidivism (Criminal Justice)",
+      "status": "PASS",
+      "strategies": {
+        "reweighting": {
+          "di_before": 0.467,
+          "di_after": 0.9984,
+          "eeoc_compliant": true,
+          "accuracy_loss": 0.97
+        },
+        "threshold_adjustment": {
+          "di_before": 0.467,
+          "di_after": 0.9984,
+          "eeoc_compliant": true,
+          "accuracy_loss": 1.29
+        },
+        "feature_removal": {
+          "di_before": 0.467,
+          "di_after": 0.7645,
+          "eeoc_compliant": false,
+          "accuracy_loss": -0.14
+        }
+      },
+      "load_time": 0.07,
+      "run_time": 4.31
+    },
+    "hmda": {
+      "dataset": "HUD HMDA Mortgage (Lending)",
+      "status": "PASS",
+      "strategies": {
+        "reweighting": {
+          "di_before": 0.7792,
+          "di_after": 0.9262,
+          "eeoc_compliant": true,
+          "accuracy_loss": 0.77
+        },
+        "threshold_adjustment": {
+          "di_before": 0.7792,
+          "di_after": 0.9986,
+          "eeoc_compliant": true,
+          "accuracy_loss": 5.67
+        },
+        "feature_removal": {
+          "di_before": 0.7792,
+          "di_after": 0.9493,
+          "eeoc_compliant": true,
+          "accuracy_loss": 0.93
+        }
+      },
+      "load_time": 0.09,
+      "run_time": 3.9
+    }
+  },
+  "test_cache_generation": {
+    "adult": {
+      "status": "PASS",
+      "file": "/home/claude/fairlens_day3/backend/app/data/cache/cached_adult.json",
+      "size_kb": 4.7
+    },
+    "compas": {
+      "status": "PASS",
+      "file": "/home/claude/fairlens_day3/backend/app/data/cache/cached_compas.json",
+      "size_kb": 5.0
+    },
+    "hmda": {
+      "status": "PASS",
+      "file": "/home/claude/fairlens_day3/backend/app/data/cache/cached_hmda.json",
+      "size_kb": 4.9
+    }
+  },
+  "test_demo_simulation": {
+    "status": "FAIL",
+    "steps": {
+      "sarah_chen_probability": 0.2085,
+      "james_chen_probability": 0.3881,
+      "james_white_probability": 0.3881,
+      "gap_percentage_points": 17.96,
+      "demo_effective": "True"
+    },
+    "error": "Object of type bool is not JSON serializable"
+  },
+  "test_json_schema": {
+    "adult": {
+      "dataset": "adult",
+      "issues": [],
+      "status": "PASS"
+    },
+    "compas": {
+      "dataset": "compas",
+      "issues": [],
+      "status": "PASS"
+    },
+    "hmda": {
+      "dataset": "hmda",
+      "issues": [],
+      "status": "PASS"
+    }
+  },
+  "summary": {
+    "timestamp": "2026-04-24T10:10:23.876319",
+    "tests_passed": 1,
+    "tests_total": 6,
+    "overall": "PARTIAL",
+    "demo_ready": false
+  }
+}
