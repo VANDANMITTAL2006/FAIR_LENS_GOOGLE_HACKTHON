@@ -13,7 +13,16 @@ venv/
 env/
 
 # Node
+node_modules/
 frontend/node_modules/
+
+# Temp directories
+_temp_stitch/
+_temp_stitch_fairlens/
+
+# Environment variables
+.env
+.env.local
 
 # IDE/editor
 .vscode/

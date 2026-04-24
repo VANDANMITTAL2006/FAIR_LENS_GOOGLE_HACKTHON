@@ -19,7 +19,7 @@ from fastapi import FastAPI, File, Query, UploadFile, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse, StreamingResponse, JSONResponse
 
-from app.config.paths import CACHED_PREFIX, DATA_DIR, UPLOAD_DIR
+from app.config.paths import CACHED_PREFIX, DATA_DIR, UPLOAD_DIR, PROJECT_ROOT
 from app.core.job_manager import JobManager, JobStage, job_manager
 from app.core.settings import settings
 from app.modules.audit_engine import audit as audit_engine_audit
@@ -27,6 +27,7 @@ from app.modules.counterfactual import get_counterfactual
 from app.modules.regulatory_radar import get_violations
 from app.modules.shap_explainer import explain
 from app.routers import audit_router, debias_router, upload_router
+from app.services.run_store import RunStore
 from app.utils.responses import error, success
 
 # Configure logging
@@ -43,6 +44,32 @@ except AttributeError:
     pass
 
 app = FastAPI(title=settings.app_name)
+
+# Persisted run ledger (enterprise auditability)
+RUN_DB_PATH = PROJECT_ROOT / "app" / "data" / "runs.db"
+run_store = RunStore(RUN_DB_PATH)
+
+
+def _next_run_id() -> str:
+    # Minimal deterministic enterprise-style ID: AUD-000001+
+    # Uses SQLite to avoid collisions and keep sequence stable.
+    with run_store._connect() as conn:  # intentional internal use
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS run_seq (
+              id INTEGER PRIMARY KEY CHECK (id = 1),
+              next_value INTEGER NOT NULL
+            )
+            """
+        )
+        row = conn.execute("SELECT next_value FROM run_seq WHERE id = 1").fetchone()
+        if row is None:
+            conn.execute("INSERT INTO run_seq (id, next_value) VALUES (1, 2)")
+            n = 1
+        else:
+            n = int(row["next_value"])
+            conn.execute("UPDATE run_seq SET next_value = ? WHERE id = 1", (n + 1,))
+    return f"AUD-{n:05d}"
 
 # Full CORS for React frontend
 app.add_middleware(
@@ -223,12 +250,18 @@ async def run_audit_pipeline(
     
     # Stage 1: INGESTION
     await job_manager.update_job_stage(job_id, JobStage.INGESTION)
+    job = await job_manager.get_job(job_id)
+    if job and job.run_id:
+        run_store.update_stage(job.run_id, status="running", stage=JobStage.INGESTION.value, progress=10)
     t_start = time.time()
     await asyncio.sleep(0.1)  # Simulate ingestion time
     contract["timings"]["ingestion"] = round(time.time() - t_start, 3)
     
     # Stage 2: PROFILING
     await job_manager.update_job_stage(job_id, JobStage.PROFILING)
+    job = await job_manager.get_job(job_id)
+    if job and job.run_id:
+        run_store.update_stage(job.run_id, stage=JobStage.PROFILING.value, progress=25)
     t_start = time.time()
     
     # Create background sample for performance optimization
@@ -238,6 +271,9 @@ async def run_audit_pipeline(
     
     # Stage 3: METRICS (core audit)
     await job_manager.update_job_stage(job_id, JobStage.METRICS)
+    job = await job_manager.get_job(job_id)
+    if job and job.run_id:
+        run_store.update_stage(job.run_id, stage=JobStage.METRICS.value, progress=40)
     t_start = time.time()
     
     try:
@@ -286,6 +322,9 @@ async def run_audit_pipeline(
     else:
         # Stage 4: SHAP
         await job_manager.update_job_stage(job_id, JobStage.SHAP)
+        job = await job_manager.get_job(job_id)
+        if job and job.run_id:
+            run_store.update_stage(job.run_id, stage=JobStage.SHAP.value, progress=60)
         t_start = time.time()
         
         try:
@@ -308,6 +347,9 @@ async def run_audit_pipeline(
         
         # Stage 5: COUNTERFACTUALS
         await job_manager.update_job_stage(job_id, JobStage.COUNTERFACTUALS)
+        job = await job_manager.get_job(job_id)
+        if job and job.run_id:
+            run_store.update_stage(job.run_id, stage=JobStage.COUNTERFACTUALS.value, progress=75)
         t_start = time.time()
         
         try:
@@ -328,6 +370,9 @@ async def run_audit_pipeline(
         
         # Stage 6: REGULATORY
         await job_manager.update_job_stage(job_id, JobStage.REGULATORY)
+        job = await job_manager.get_job(job_id)
+        if job and job.run_id:
+            run_store.update_stage(job.run_id, stage=JobStage.REGULATORY.value, progress=90)
         t_start = time.time()
         
         try:
@@ -404,6 +449,18 @@ async def audit_stream_endpoint(job_id: str, request: Request) -> StreamingRespo
                 event = job.to_sse_payload()
                 yield f'data: {json.dumps(event)}\n\n'
                 if job.stage == JobStage.DONE:
+                    if job.run_id:
+                        try:
+                            run_store.complete(job.run_id, result=job.result or {})
+                        except Exception as e:
+                            logger.error(f"[RunLedger] Failed to mark complete for {job.run_id}: {e}")
+                    break
+                if job.stage == JobStage.ERROR:
+                    if job.run_id:
+                        try:
+                            run_store.fail(job.run_id, error=job.error or "failed")
+                        except Exception as e:
+                            logger.error(f"[RunLedger] Failed to mark failed for {job.run_id}: {e}")
                     break
             
             # Stream every 400ms
@@ -464,11 +521,23 @@ async def upload_with_job(file: UploadFile = File(...)):
     # Generate job_id and save file
     UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
     job_id = uuid.uuid4().hex
+    run_id = _next_run_id()
     upload_path = UPLOAD_DIR / f"{job_id}.csv"
     df.to_csv(upload_path, index=False)
     
     # Initialize job in JobManager with df stored in memory
-    await job_manager.create_job(job_id, df=df)
+    await job_manager.create_job(job_id, df=df, run_id=run_id)
+    # Persist run record (traceability fields can be enriched later by config)
+    run_store.create_run(
+        run_id,
+        job_id,
+        dataset_id=f"DS-{job_id[:8].upper()}",
+        dataset_name=_determine_dataset_name(df),
+        dataset_source="upload",
+        model_id="model_registry:unassigned",
+        model_version="unassigned",
+        policy_version="fairness_policy_v1.0",
+    )
     
     # Detect protected attributes for response
     from app.services.attribute_detector import detect_attributes
@@ -483,6 +552,7 @@ async def upload_with_job(file: UploadFile = File(...)):
         "filename": file.filename,
         "upload_id": job_id,
         "job_id": job_id,
+        "run_id": run_id,
         "dataset_ref": upload_path.name,
     })
 
@@ -694,6 +764,7 @@ def list_jobs_endpoint():
         "jobs": [
             {
                 "job_id": j.job_id,
+                "run_id": j.run_id,
                 "status": j.status,
                 "stage": j.stage.value,
                 "progress": j.progress,
@@ -701,3 +772,20 @@ def list_jobs_endpoint():
             for j in jobs.values()
         ],
     })
+
+
+# ============================================================================
+# RUN LEDGER ENDPOINTS (Persisted Audit History)
+# ============================================================================
+
+@app.get("/runs")
+def list_runs(limit: int = 50):
+    return success({"runs": run_store.list_runs(limit=limit)})
+
+
+@app.get("/runs/{run_id}")
+def get_run(run_id: str):
+    rec = run_store.get_run(run_id)
+    if not rec:
+        return error("not found", f"run_id={run_id}")
+    return success(rec)

@@ -54,6 +54,7 @@ STAGE_MESSAGES = {
 class JobState:
     """Represents the current state of an audit job."""
     job_id: str
+    run_id: str | None = None
     status: str = "pending"  # pending, running, completed, failed
     stage: JobStage = JobStage.WAITING
     progress: int = 0
@@ -68,6 +69,7 @@ class JobState:
     def to_sse_payload(self) -> dict:
         """Convert to SSE event payload with done/result fields."""
         return {
+            "run_id": self.run_id,
             "stage": self.stage.value,
             "progress": self.progress,
             "message": self.message,
@@ -102,11 +104,12 @@ class JobManager:
         self._jobs: dict[str, JobState] = {}
         self._lock = asyncio.Lock()
 
-    async def create_job(self, job_id: str, df: Any = None) -> JobState:
+    async def create_job(self, job_id: str, df: Any = None, run_id: str | None = None) -> JobState:
         """Initialize a new job with optional DataFrame."""
         async with self._lock:
             job = JobState(
                 job_id=job_id,
+                run_id=run_id,
                 status="pending",
                 stage=JobStage.WAITING,
                 progress=0,

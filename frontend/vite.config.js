@@ -6,30 +6,12 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/upload': {
-        target: 'http://127.0.0.1:8000',
-        changeOrigin: true,
-      },
-      '/audit': {
-        target: 'http://127.0.0.1:8000',
-        changeOrigin: true,
-      },
-      '/api': {
-        target: 'http://127.0.0.1:8000',
-        changeOrigin: true,
-      },
-      '/health': {
-        target: 'http://127.0.0.1:8000',
-        changeOrigin: true,
-      },
-      '/audit-stream': {
-        target: 'http://127.0.0.1:8000',
-        changeOrigin: true,
-      },
-      '/cached-audit': {
-        target: 'http://127.0.0.1:8000',
-        changeOrigin: true,
-      },
+      '/upload': 'http://localhost:8000',
+      '/audit': 'http://localhost:8000',
+      '/report': 'http://localhost:8000',
+      '/health': 'http://localhost:8000',
+      '/jobs': 'http://localhost:8000',
+      '/runs': 'http://localhost:8000',
     },
   },
 })

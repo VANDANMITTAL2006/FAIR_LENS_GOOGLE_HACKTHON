@@ -11,8 +11,20 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  background: #020617;
-  color: #ffffff;
+  /* Design tokens (enterprise dark) */
+  --bg: 11 15 20;              /* #0B0F14 */
+  --surface: 15 20 28;         /* deep slate */
+  --surface-2: 17 24 39;       /* slightly brighter */
+  --text: 229 231 235;         /* #E5E7EB */
+  --muted: 148 163 184;        /* slate-400 */
+  --border: 255 255 255;       /* used with low alpha */
+  --primary: 255 255 255;
+  --danger: 248 113 113;       /* red-400 */
+  --warning: 251 191 36;       /* amber-400 */
+  --success: 74 222 128;       /* green-400 */
+
+  background: rgb(var(--bg));
+  color: rgb(var(--text));
 }
 
 html {
@@ -23,12 +35,8 @@ body {
   margin: 0;
   min-height: 100vh;
   overflow-x: hidden;
-
-  background:
-    radial-gradient(circle at 10% 10%, rgba(56, 189, 248, 0.10), transparent 22%),
-    radial-gradient(circle at 90% 20%, rgba(16, 185, 129, 0.08), transparent 20%),
-    radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.07), transparent 18%),
-    linear-gradient(180deg, #020617 0%, #07111f 40%, #020617 100%);
+  background-color: rgb(var(--bg));
+  color: rgb(var(--text));
 }
 
 #root {
@@ -50,41 +58,107 @@ button {
   transition: all 0.2s ease;
 }
 
+button:active {
+  transform: scale(0.98);
+}
+
 img {
   max-width: 100%;
   display: block;
 }
 
 ::selection {
-  background: rgba(56, 189, 248, 0.25);
+  background: rgba(255, 255, 255, 0.15);
   color: #fff;
 }
 
 /* Scrollbar */
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #020617;
+  background: #0B0F14;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
+  background: #353435;
   border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: #44474a;
 }
 
-/* Utility */
-.glass {
-  background: rgba(15, 23, 42, 0.65);
-  backdrop-filter: blur(14px);
-  border: 1px solid rgba(148, 163, 184, 0.08);
+/* Glass Card utility */
+.glass-card {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0.03) 100%
+  );
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+@layer components {
+  .app-shell {
+    @apply min-h-screen bg-background text-on-surface font-body;
+  }
+
+  .glass {
+    @apply glass-card;
+  }
+
+  .glass-hover {
+    @apply transition will-change-transform;
+  }
+  .glass-hover:hover {
+    transform: translateY(-1px);
+  }
+
+  .focus-ring {
+    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20 focus-visible:ring-offset-0;
+  }
+
+  .ui-input {
+    @apply w-full rounded-xl bg-white/[0.04] border border-white/10 text-on-surface placeholder:text-slate-500
+      px-3 py-2 text-sm focus-ring;
+  }
+
+  .ui-divider {
+    @apply border-t border-white/10;
+  }
+}
+
+/* Particle background */
+.particle-bg {
+  background-image:
+    radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0);
+  background-size: 24px 24px;
+}
+
+/* Bias glow effects */
+.bias-glow-red {
+  text-shadow: 0 0 20px rgba(147, 0, 10, 0.6);
+}
+
+.bias-glow-green {
+  text-shadow: 0 0 20px rgba(22, 101, 52, 0.6);
+}
+
+/* Gradient progress bar */
+.progress-gradient {
+  background: linear-gradient(90deg, #ef4444, #eab308, #22c55e);
+}
+
+/* No-line rule: prefer gap over borders */
+.no-border {
+  border: none !important;
+}
+
+/* Section padding */
 .section-padding {
   padding-left: 1rem;
   padding-right: 1rem;
