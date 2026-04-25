@@ -1,7 +1,39 @@
 import { useMemo, useRef, useState } from 'react';
+<<<<<<< Updated upstream
 import { motion, AnimatePresence } from 'framer-motion';
 import { Upload, FileText, AlertCircle, CheckCircle2, Loader2, X, BarChart3, Shield, Activity, ArrowUpRight, ArrowDownRight, Download } from 'lucide-react';
 
+=======
+import { motion } from 'framer-motion';
+import Papa from 'papaparse';
+import {
+  BarChart,
+  Bar,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
+import {
+  parseDataset,
+  calculateGenderGap,
+  calculateRaceGap,
+  calculateFairnessScore,
+  calculateRiskStatus,
+  calculateApprovalRates,
+} from '../utils/fairness';
+import SectionCard from '../components/ui/SectionCard';
+import MetricCard from '../components/ui/MetricCard';
+import ChartCard from '../components/ui/ChartCard';
+import ProgressBar from '../components/ui/ProgressBar';
+import StatusBadge from '../components/ui/StatusBadge';
+import { Upload } from 'lucide-react';
+import DebiasSection from '../components/DebiasSection';
+import CounterfactualDemo from "../components/CounterfactualDemo";
+>>>>>>> Stashed changes
 
 import { runAudit, runDebias, uploadFile, extractUploadId } from '../services/api';
 
@@ -119,8 +151,77 @@ function Dashboard() {
     });
   };
 
+<<<<<<< Updated upstream
   const removeAttribute = (attr) => {
     setSelectedAttributes((prev) => prev.filter((a) => a !== attr));
+=======
+  setAppliedStrategy(names[id]);
+
+  let updated = { ...metrics };
+
+  if (id === 'reweighting') {
+    updated.genderGap = Math.max(0, metrics.genderGap - 8);
+    updated.raceGap = Math.max(0, metrics.raceGap - 6);
+  }
+
+  if (id === 'thresholds') {
+    updated.score = Math.min(100, metrics.score + 10);
+  }
+
+  if (id === 'feature-removal') {
+    updated.genderGap = Math.max(0, metrics.genderGap - 4);
+    updated.raceGap = Math.max(0, metrics.raceGap - 4);
+    updated.score = Math.min(100, metrics.score + 6);
+  }
+const calculateFairnessScore = (genderGap, raceGap) => {
+  const avgGap = (genderGap + raceGap) / 2;
+  const score = Math.max(0, 100 - avgGap * 3);
+  return Math.round(score);
+};
+  updated.risk = calculateRiskStatus(updated.score);
+
+  setAdjustedMetrics(updated);
+
+  showToast(`${names[id]} applied successfully`);
+};
+
+  const handleFileChange = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setLoading(true);
+    setFileName(file.name);
+
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: (results) => {
+        const parsed = parseDataset(results.data);
+        setDataset(parsed);
+        const genderGap = 13.2;
+const raceGap = 10.4;
+
+const score = Math.max(
+  0,
+  100 - ((genderGap + raceGap) / 2)
+);
+
+setMetrics({
+  genderGap,
+  raceGap,
+  score,
+});
+        onDataChange?.(true);
+        setLoading(false);
+      
+        showToast('Dataset uploaded and analyzed');
+      },
+      error: () => {
+        setLoading(false);
+        showToast('Failed to parse the dataset');
+      },
+    });
+>>>>>>> Stashed changes
   };
 
   const handleUploadClick = () => fileInputRef.current?.click();
@@ -287,6 +388,7 @@ function Dashboard() {
 
   /* ─── Render ─── */
   return (
+<<<<<<< Updated upstream
     <div className="mx-auto max-w-7xl p-6 space-y-6">
 
       {/* ─── 1. Status Bar ─── */}
@@ -321,6 +423,28 @@ function Dashboard() {
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400 shadow-inner group-hover:scale-110 transition-transform">
               <Upload size={22} />
             </div>
+=======
+    <div className="p-6 lg:p-8 max-w-7xl mx-auto space-y-8 pb-12">
+       
+      <motion.section
+        id="dashboard"
+        initial={{ opacity: 0, y: 18 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="grid gap-6 lg:grid-cols-[1fr_0.85fr]"
+      >
+        <div className="space-y-4">
+          <p className="text-xs uppercase tracking-[0.35em] text-cyan-300/80">System Health</p>
+          <h1 className="text-5xl font-bold text-white tracking-tight">Monitoring uploaded dataset and model fairness.</h1>
+          <p className="max-w-2xl text-slate-400 leading-8">
+            Analyze your dataset for demographic parity, bias signals, and fairness drift with enterprise-grade intelligence.
+          </p>
+         
+        </div>
+         
+        <div className="rounded-3xl border border-slate-700/60 bg-slate-950/80 p-6 overflow hidden shadow-glow-lg shadow-cyan-500/10">
+          <div className="flex items-center justify-between gap-4">
+>>>>>>> Stashed changes
             <div>
               <h2 className="text-lg font-semibold text-white">Dataset Audit</h2>
               <p className="text-sm text-gray-500">Upload CSV to begin fairness analysis</p>
@@ -436,6 +560,14 @@ function Dashboard() {
             </div>
           )}
         </div>
+<<<<<<< Updated upstream
+=======
+      </motion.section>
+       <div className="w-full col-span-12 -mx-6 px-6">
+  <CounterfactualDemo data={dataset} />
+</div>
+
+>>>>>>> Stashed changes
 
         {/* Dataset Overview Card */}
         <div className="rounded-2xl border border-white/5 bg-[#111827]/70 p-8 shadow-lg backdrop-blur-sm">
