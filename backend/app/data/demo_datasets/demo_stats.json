@@ -1,0 +1,37 @@
+{
+  "generated_at": "2026-04-25",
+  "datasets": {
+    "adult": {
+      "file": "adult_demo.csv",
+      "rows": 8883,
+      "bias_stats": {
+        "disparate_impact": 0.565,
+        "gap_pts": 16.8,
+        "eeoc_violation": true,
+        "sarah_chen": 0.208,
+        "james_white": 0.388,
+        "name_swap_gap": 18.0
+      }
+    },
+    "compas": {
+      "file": "compas_demo.csv",
+      "rows": 7214,
+      "bias_stats": {
+        "aa_high_risk": 0.308,
+        "ca_high_risk": 0.112,
+        "ratio": 2.8,
+        "propublica_confirmed": true
+      }
+    },
+    "hmda": {
+      "file": "hmda_demo.csv",
+      "rows": 8107,
+      "bias_stats": {
+        "black_denial": 0.437,
+        "white_denial": 0.187,
+        "ratio": 2.3,
+        "ecoa_violation": true
+      }
+    }
+  }
+}
