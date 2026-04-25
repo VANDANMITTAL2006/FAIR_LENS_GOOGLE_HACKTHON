@@ -42,7 +42,7 @@ STAGE_MESSAGES = {
     JobStage.INGESTION: "Loading and validating dataset...",
     JobStage.PROFILING: "Detecting protected attributes...",
     JobStage.METRICS: "Computing fairness metrics (demographic parity, equalized odds)...",
-    JobStage.SHAP: "Running SHAP feature importance analysis...",
+    JobStage.SHAP: "Running feature attribution analysis...",
     JobStage.COUNTERFACTUALS: "Generating counterfactual explanations...",
     JobStage.REGULATORY: "Checking regulatory compliance (EEOC, GDPR)...",
     JobStage.DONE: "Audit complete!",

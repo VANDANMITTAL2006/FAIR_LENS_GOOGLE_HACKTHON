@@ -90,10 +90,10 @@ app.include_router(debias_router)
 # HELPER FUNCTIONS
 # ============================================================================
 
-def load_fallback_json(dataset_name: str) -> dict:
+def load_fallback_json(dataset_name: str) -> dict | None:
     """
     Load pre-computed audit JSON from fallback directory.
-    Tries multiple path patterns. Returns hardcoded minimal fallback if no file found.
+    Returns None if no real fallback file found (no hardcoded fake data).
     """
     base_names = [dataset_name, dataset_name.lower(), dataset_name.replace("_", "")]
     search_dirs = [
@@ -103,7 +103,7 @@ def load_fallback_json(dataset_name: str) -> dict:
         Path("./fallback"),
         Path(DATA_DIR) / "fallback",
     ]
-    
+
     for search_dir in search_dirs:
         for base in base_names:
             path = search_dir / f"{base}_audit.json"
@@ -111,55 +111,13 @@ def load_fallback_json(dataset_name: str) -> dict:
                 try:
                     with path.open("r", encoding="utf-8") as f:
                         data = json.load(f)
-                        logger.warning(f"[Fallback] Loaded pre-computed audit from {path}")
+                        logger.info(f"[Fallback] Loaded pre-computed audit from {path}")
                         return data
                 except Exception as e:
                     logger.error(f"[Fallback] Failed to parse {path}: {e}")
                     continue
-    
-    logger.warning(f"[Fallback] No pre-computed file found for {dataset_name}; using hardcoded fallback")
-    return _hardcoded_fallback(dataset_name)
 
-
-def _hardcoded_fallback(dataset_name: str) -> dict:
-    """Return a minimal but realistic fallback audit dict."""
-    return {
-        "dataset": dataset_name,
-        "rows_audited": 0,
-        "status": "partial",
-        "fallback": True,
-        "protected_attributes": ["sex", "race", "age"],
-        "metrics": {
-            "disparate_impact": 0.23,
-            "statistical_parity_difference": 0.19,
-            "equalized_odds_difference": 0.15,
-            "predictive_parity": 0.12,
-            "demographic_parity_gap": 0.23,
-        },
-        "shap_summary": {
-            "top_features": [
-                {"feature": "capital_gain", "impact": 0.34},
-                {"feature": "education_num", "impact": 0.21},
-                {"feature": "hours_per_week", "impact": 0.18},
-            ]
-        },
-        "regulatory_flags": [
-            {"law": "EEOC", "clause": "4/5ths Rule", "violation": True, "severity": "high"},
-            {"law": "EU AI Act", "clause": "Article 10", "violation": True, "severity": "high"},
-        ],
-        "counterfactual_example": {
-            "original": {"name": "Sarah Chen", "probability": 0.34},
-            "flipped": {"name": "James White", "probability": 0.71},
-            "delta": 0.37,
-        },
-        "debiasing_strategies": [
-            {"name": "Reweighting", "fairness_gain": 0.19, "accuracy_loss": 0.012},
-            {"name": "Threshold Adjustment", "fairness_gain": 0.15, "accuracy_loss": 0.008},
-            {"name": "Feature Removal", "fairness_gain": 0.11, "accuracy_loss": 0.023},
-        ],
-        "computed_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-        "warning": "This is a fallback result. Real-time audit was unavailable.",
-    }
+    return None  # No fake data — let caller handle the failure honestly
 
 
 def _determine_dataset_name(df: pd.DataFrame) -> str:
@@ -481,167 +439,14 @@ async def audit_stream_endpoint(job_id: str, request: Request) -> StreamingRespo
     )
 
 
-# ============================================================================
-# UPLOAD ENDPOINT WITH JOB CREATION
-# ============================================================================
-
-@app.post("/upload")
-async def upload_with_job(file: UploadFile = File(...)):
-    """
-    Upload endpoint that creates a job_id for SSE streaming.
-    Returns upload_id (used as job_id) for tracking audit progress.
-    """
-    filename = (file.filename or "").lower()
-    data = await file.read()
-    
-    if not data:
-        return error("File is empty")
-    
-    try:
-        if filename.endswith(".csv"):
-            try:
-                df = pd.read_csv(BytesIO(data))
-            except Exception:
-                return error("Invalid CSV")
-        elif filename.endswith(".json"):
-            payload = json.loads(data.decode("utf-8"))
-            if isinstance(payload, dict) and "data" in payload:
-                payload = payload["data"]
-            if not isinstance(payload, list):
-                return error("Invalid JSON format: expected list or {data: [...]}")
-            df = pd.DataFrame(payload)
-        else:
-            return error("Unsupported file type. Use .csv or .json")
-    except Exception as exc:
-        return error("Parse error", str(exc))
-    
-    if df.empty:
-        return error("File is empty")
-    
-    # Generate job_id and save file
-    UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
-    job_id = uuid.uuid4().hex
-    run_id = _next_run_id()
-    upload_path = UPLOAD_DIR / f"{job_id}.csv"
-    df.to_csv(upload_path, index=False)
-    
-    # Initialize job in JobManager with df stored in memory
-    await job_manager.create_job(job_id, df=df, run_id=run_id)
-    # Persist run record (traceability fields can be enriched later by config)
-    run_store.create_run(
-        run_id,
-        job_id,
-        dataset_id=f"DS-{job_id[:8].upper()}",
-        dataset_name=_determine_dataset_name(df),
-        dataset_source="upload",
-        model_id="model_registry:unassigned",
-        model_version="unassigned",
-        policy_version="fairness_policy_v1.0",
-    )
-    
-    # Detect protected attributes for response
-    from app.services.attribute_detector import detect_attributes
-    protected = detect_attributes(df)
-    
-    logger.info(f"[Upload] Created job {job_id} for {file.filename} ({len(df)} rows)")
-    
-    return success({
-        "rows": len(df),
-        "columns": list(df.columns),
-        "protected_attributes": protected,
-        "filename": file.filename,
-        "dataset_id": job_id,
-        "upload_id": job_id,
-        "job_id": job_id,
-        "run_id": run_id,
-        "dataset_ref": upload_path.name,
-    })
-
 
 # ============================================================================
-# AUDIT ENDPOINT WITH FALLBACK
+# NOTE: /upload and /audit endpoints are served by app/routers/upload.py
+# and app/routers/audit.py (registered via include_router above).
+# Do NOT add duplicate route definitions here.
 # ============================================================================
 
-from fastapi import Request as FastAPIRequest
 
-@app.post("/audit")
-async def audit_with_fallback(request: FastAPIRequest):
-    """
-    Audit endpoint with 10s timeout and pre-computed fallback.
-    Accepts JSON body with job_id (loads df from memory) or legacy file/upload params.
-    On timeout or exception, silently loads fallback and returns HTTP 200.
-    """
-    body = {}
-    try:
-        body = await request.json()
-    except Exception:
-        pass
-    
-    job_id = body.get("job_id")
-    dataset_id = body.get("dataset_id")
-    upload_id = body.get("upload_id") or dataset_id
-    dataset_name = body.get("dataset") or "uploaded_file"
-    fast_mode = body.get("fast_mode", False)
-    df: pd.DataFrame | None = None
-    
-    # Load DataFrame from in-memory job store if job_id provided
-    if job_id:
-        job = await job_manager.get_job(job_id)
-        if job and job.df is not None:
-            df = job.df
-            dataset_name = _determine_dataset_name(df)
-    
-    # Fallback: try uploaded file on disk
-    if df is None:
-        upload_id = body.get("upload_id")
-        if upload_id:
-            upload_path = UPLOAD_DIR / f"{upload_id}.csv"
-            if upload_path.exists():
-                df = pd.read_csv(upload_path)
-                dataset_name = f"upload_{upload_id[:8]}"
-    
-    if df is None or df.empty:
-        fallback = load_fallback_json(dataset_name)
-        if fallback:
-            logger.warning(f"[Audit] Returning fallback for empty/missing dataset")
-            return JSONResponse(content=fallback)
-        return error("No data provided")
-    
-    # Run audit with timeout
-    try:
-        result = await asyncio.wait_for(
-            run_audit_pipeline(
-                job_id=f"sync_{uuid.uuid4().hex[:8]}",
-                df=df,
-                dataset_name=dataset_name,
-                fast_mode=fast_mode,
-            ),
-            timeout=10.0,
-        )
-        return JSONResponse(content=result)
-    except asyncio.TimeoutError:
-        logger.warning(f"[Audit] Timeout for {dataset_name}, loading fallback")
-        fallback = load_fallback_json(dataset_name)
-        if fallback:
-            return JSONResponse(content=fallback)
-        # Return partial result with error
-        return JSONResponse(content={
-            "status": "failed",
-            "dataset_name": dataset_name,
-            "error": "Audit timeout - no fallback available",
-            "component_status": {"audit": "timeout", "shap": "skipped", "counterfactual": "skipped", "regulatory": "skipped", "cache": "miss"},
-        })
-    except Exception as e:
-        logger.error(f"[Audit] Exception for {dataset_name}: {e}")
-        fallback = load_fallback_json(dataset_name)
-        if fallback:
-            return JSONResponse(content=fallback)
-        return JSONResponse(content={
-            "status": "failed",
-            "dataset_name": dataset_name,
-            "error": str(e),
-            "component_status": {"audit": "failed", "shap": "skipped", "counterfactual": "skipped", "regulatory": "skipped", "cache": "miss"},
-        })
 
 
 # ============================================================================
