@@ -18,28 +18,23 @@ KNOWN_PROTECTED = POSSIBLE_PROTECTED
 
 def detect_attributes(df: pd.DataFrame) -> list[str]:
     """Detect potential protected attributes based on column names and data types."""
-    print(f"[DEBUG] All columns in dataset: {list(df.columns)}")
-    
-    # 1. Name-based detection (Flexible substring matching)
+    # 1. Name-based detection (flexible substring matching)
     protected_columns = [
         col for col in df.columns
         if any(key in col.lower() for key in POSSIBLE_PROTECTED)
     ]
-    
-    # 2. Smart Fallback (Critical for Demo): If no protected column is detected
+
+    # 2. Smart fallback: if no protected column detected, pick low-cardinality column
     if not protected_columns:
-        print("[DEBUG] No protected attributes found by name. Triggering smart fallback...")
+        logger.debug("No protected attributes found by name. Triggering smart fallback.")
         for col in df.columns:
-            # Skip likely target columns
             if col.lower() in ["y", "target", "label", "outcome", "action_taken"]:
                 continue
-                
             nunique = df[col].nunique()
-            # Pick a column with low unique values (2-10) which is often a categorical/protected attribute
             if 2 <= nunique <= 10:
-                print(f"[DEBUG] Fallback: picked '{col}' (nunique={nunique}) as potential protected attribute")
+                logger.debug(f"Fallback: picked '{col}' (nunique={nunique})")
                 protected_columns = [col]
                 break
-    
-    print(f"[DEBUG] Detected protected attributes: {protected_columns}")
+
+    logger.debug(f"Detected protected attributes: {protected_columns}")
     return protected_columns

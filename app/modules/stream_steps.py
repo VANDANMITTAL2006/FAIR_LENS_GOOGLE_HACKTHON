@@ -1,9 +1,9 @@
 AUDIT_STEPS = [
-    "Ingesting dataset...",
+    "Loading dataset...",
     "Detecting protected attributes...",
-    "Computing 4 fairness metrics...",
-    "Running SHAP explainer...",
-    "Generating counterfactuals...",
-    "Mapping regulatory violations...",
-    "DONE"
+    "Computing fairness metrics...",
+    "Running feature attribution analysis...",
+    "Generating counterfactual explanations...",
+    "Checking regulatory compliance...",
+    "Audit complete!"
 ]

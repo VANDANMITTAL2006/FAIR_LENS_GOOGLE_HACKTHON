@@ -297,11 +297,14 @@ def run_full_audit(df: pd.DataFrame, dataset_name: str = "uploaded_file", fast_m
             contract["warnings"].append(f"regulatory failed: {exc}")
             contract["component_status"]["regulatory"] = "failed"
 
+    # Determine final status
+    # fast_mode skips are intentional and should not degrade status
+    real_warnings = [w for w in contract["warnings"] if "fast mode" not in w]
     if contract["component_status"]["audit"] == "failed":
         contract["status"] = "failed"
     elif any(status == "failed" for status in contract["component_status"].values() if status in {"ok", "failed", "fallback"}):
         contract["status"] = "partial"
-    elif contract["warnings"]:
+    elif real_warnings:
         contract["status"] = "partial"
     else:
         contract["status"] = "ok"
