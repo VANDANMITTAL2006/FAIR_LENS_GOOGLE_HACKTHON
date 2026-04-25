@@ -18,17 +18,44 @@ const navItems = [
 
 const Navbar = ({ onLoadDemo, onExport }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [query, setQuery] = useState("");
 
   const scrollToSection = (id) => {
     const section = document.getElementById(id);
+
     if (section) {
       section.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
+        behavior: "smooth",
+        block: "start",
       });
     }
+
     setIsMenuOpen(false);
   };
+
+  const handleSearch = (value) => {
+    setQuery(value);
+
+    const match = navItems.find((item) =>
+      item.label.toLowerCase().includes(value.toLowerCase())
+    );
+
+    if (match && value.trim() !== "") {
+      scrollToSection(match.id);
+    }
+  };
+
+  const handleLoadDemo = () => {
+    if (onLoadDemo) onLoadDemo();
+    else alert("Load Demo function not connected yet.");
+  };
+
+  const handleExport = () => {
+    if (onExport) onExport();
+    else alert("Export function not connected yet.");
+  };
+
+  
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-slate-800 bg-[#07111f]/95 backdrop-blur-xl">
@@ -74,9 +101,11 @@ const Navbar = ({ onLoadDemo, onExport }) => {
           <div className="hidden xl:flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-950 px-3 py-2 text-slate-400">
             <Search size={14} />
             <input
-              placeholder="Search insights..."
-              className="w-44 bg-transparent text-sm outline-none placeholder:text-slate-500"
-            />
+  value={query}
+  onChange={(e) => handleSearch(e.target.value)}
+  placeholder="Search sections..."
+  className="w-44 bg-transparent text-sm outline-none placeholder:text-slate-500"
+/>
           </div>
 
           <button className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-800 bg-slate-900 text-slate-300 hover:text-white">
@@ -88,14 +117,14 @@ const Navbar = ({ onLoadDemo, onExport }) => {
           </button>
 
           <button
-            onClick={onLoadDemo}
+            onClick={handleLoadDemo}
             className="rounded-xl border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
           >
             Load Demo
           </button>
 
           <button
-            onClick={onExport}
+            onClick={handleExport}
             className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700"
           >
             <Download size={14} />
