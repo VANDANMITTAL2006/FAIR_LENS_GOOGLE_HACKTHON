@@ -1,0 +1,61 @@
+{
+  "datasets": {
+    "adult_demo": {
+      "status": "ok",
+      "audit_di_before": 0.4709767571935205,
+      "audit_dp": 0.24480588456517605,
+      "audit_eo": 0.0,
+      "primary_protected": "sex",
+      "risk_level": "High",
+      "consistent": true,
+      "debias_best_strategy": "threshold_adjustment",
+      "debias_di_before": 0.4988,
+      "debias_di_after": 0.997,
+      "debias_di_gain": 0.4982,
+      "real_improvement": true,
+      "recommended_strategy": "threshold_adjustment"
+    },
+    "compas_demo": {
+      "status": "ok",
+      "audit_di_before": 0.23917685886235684,
+      "audit_dp": 0.3118633817163229,
+      "audit_eo": 0.3484617639651022,
+      "primary_protected": "race",
+      "risk_level": "High",
+      "consistent": true,
+      "debias_best_strategy": "threshold_adjustment",
+      "debias_di_before": 0.3095,
+      "debias_di_after": 0.75,
+      "debias_di_gain": 0.4405,
+      "real_improvement": true,
+      "recommended_strategy": "threshold_adjustment"
+    },
+    "hmda_demo": {
+      "status": "ok",
+      "audit_di_before": 0.746160064672595,
+      "audit_dp": 0.253839935327405,
+      "audit_eo": 0.3179297597042514,
+      "primary_protected": "applicant_race_1",
+      "risk_level": "High",
+      "consistent": true,
+      "debias_best_strategy": "threshold_adjustment",
+      "debias_di_before": 0.6626,
+      "debias_di_after": 0.9231,
+      "debias_di_gain": 0.2605,
+      "real_improvement": true,
+      "recommended_strategy": "threshold_adjustment"
+    },
+    "hmda_demo_gender": {
+      "di_before": 0.9876,
+      "di_after": 0.9991,
+      "near_fair": true
+    }
+  },
+  "issues": {
+    "crashes": [],
+    "inconsistent": [],
+    "no_improvement": [],
+    "fallback": []
+  },
+  "score": 10
+}
