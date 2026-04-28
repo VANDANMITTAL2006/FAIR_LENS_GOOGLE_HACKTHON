@@ -1,23 +1,63 @@
 // FairLens API Service
-// All requests go to the FastAPI backend on port 8000
-const API_BASE = "http://127.0.0.1:8000";
+// All requests go to the Railway-deployed FastAPI backend.
+const API_BASE = 'https://web-production-dfc61.up.railway.app';
+const REQUEST_TIMEOUT_MS = 30000;
 
-async function parseResponse(response) {
-  let payload;
+function normalizeError(message, fallback) {
+  return new Error(message || fallback);
+}
+
+async function requestJson(url, options = {}) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
   try {
-    payload = await response.json();
-  } catch {
-    throw new Error(`Server returned non-JSON response (HTTP ${response.status})`);
+    const response = await fetch(url, {
+      credentials: 'omit',
+      ...options,
+      headers: {
+        Accept: 'application/json',
+        ...(options.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
+        ...(options.headers || {}),
+      },
+      signal: controller.signal,
+    });
+
+    const contentType = response.headers.get('content-type') || '';
+    let payload = null;
+
+    if (contentType.includes('application/json')) {
+      try {
+        payload = await response.json();
+      } catch {
+        throw normalizeError(`Server returned invalid JSON (HTTP ${response.status})`, 'Request failed');
+      }
+    } else {
+      const text = await response.text();
+      payload = text ? { detail: text } : null;
+    }
+
+    if (!response.ok) {
+      const detail = payload?.detail || payload?.error || `Request failed (HTTP ${response.status})`;
+      throw normalizeError(String(detail), 'Request failed');
+    }
+
+    if (payload?.success === false) {
+      throw normalizeError(payload?.error || payload?.detail, 'Request failed');
+    }
+
+    return payload;
+  } catch (error) {
+    if (error?.name === 'AbortError') {
+      throw new Error('Request timed out. Please try again.');
+    }
+    if (error instanceof TypeError && /fetch/i.test(String(error?.message || ''))) {
+      throw new Error('Unable to reach the FairLens API. Please check your network or try again.');
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
   }
-  if (!response.ok) {
-    const detail = payload?.detail || payload?.error || 'Request failed';
-    throw new Error(String(detail));
-  }
-  // Backend may return 200 with { success: false, error: "..." }
-  if (payload?.success === false) {
-    throw new Error(payload?.error || payload?.detail || 'Request failed');
-  }
-  return payload;
 }
 
 /**
@@ -31,32 +71,11 @@ export async function uploadFile(file) {
   const formData = new FormData();
   formData.append('file', file, file.name || 'upload.csv');
 
-  const response = await fetch(`${API_BASE}/upload`, {
+  return requestJson(`${API_BASE}/upload`, {
     method: 'POST',
     body: formData,
     // Do NOT set Content-Type — browser sets multipart boundary
   });
-
-  if (!response.ok) {
-    let errorMsg = `Upload failed (HTTP ${response.status})`;
-    try {
-      const body = await response.json();
-      if (Array.isArray(body?.detail)) {
-        errorMsg = body.detail.map((d) => d.msg || d.type).join('; ');
-      } else if (body?.detail) {
-        errorMsg = String(body.detail);
-      } else if (body?.error) {
-        errorMsg = String(body.error);
-      }
-    } catch { /* ignore */ }
-    throw new Error(errorMsg);
-  }
-
-  const result = await response.json();
-  if (result?.success === false) {
-    throw new Error(result?.error || 'Upload returned failure');
-  }
-  return result;
 }
 
 /**
@@ -78,13 +97,9 @@ export function extractUploadId(uploadRes) {
 export async function runAudit(uploadId) {
   if (!uploadId) throw new Error('upload_id missing from upload response');
 
-  const response = await fetch(
-    `${API_BASE}/audit?upload_id=${encodeURIComponent(uploadId)}`,
-    { method: 'POST' }
-  );
-
-  const result = await parseResponse(response);
-  return result;
+  return requestJson(`${API_BASE}/audit?upload_id=${encodeURIComponent(uploadId)}`, {
+    method: 'POST',
+  });
 }
 
 /**
@@ -98,10 +113,10 @@ export async function runDebias({ file, labelCol, protectedCol, privilegedGroup 
   formData.append('protected_col', protectedCol);
   formData.append('privileged_group', String(privilegedGroup));
 
-  const response = await fetch(`${API_BASE}/api/debias`, {
+  return requestJson(`${API_BASE}/api/debias`, {
     method: 'POST',
     body: formData,
   });
-
-  return parseResponse(response);
 }
+
+export { API_BASE };

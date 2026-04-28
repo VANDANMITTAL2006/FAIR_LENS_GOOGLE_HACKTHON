@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { API_BASE } from '../services/api';
 
 /**
  * Enterprise Audit Execution Flow Hook
@@ -42,7 +43,7 @@ export function useAuditFlow({ onComplete, onError } = {}) {
 
       console.log("Uploading file...");
 
-      const uploadRes = await fetch("http://127.0.0.1:8000/upload", {
+      const uploadRes = await fetch(`${API_BASE}/upload`, {
         method: "POST",
         body: formData
       });
@@ -64,7 +65,7 @@ export function useAuditFlow({ onComplete, onError } = {}) {
       setMessage('Provisioning audit job...');
       setProgress(50);
 
-      const auditRes = await fetch("http://127.0.0.1:8000/audit", {
+      const auditRes = await fetch(`${API_BASE}/audit`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
