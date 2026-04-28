@@ -60,6 +60,22 @@ async function requestJson(url, options = {}) {
   }
 }
 
+export function extractData(payload) {
+  if (!payload || typeof payload !== 'object') {
+    return payload;
+  }
+
+  if ('data' in payload) {
+    return payload.data;
+  }
+
+  if (payload.success === true && 'result' in payload) {
+    return payload.result;
+  }
+
+  return payload;
+}
+
 /**
  * POST /upload — Upload a CSV file.
  * Returns: { success: true, data: { upload_id: "...", rows, columns, ... } }
@@ -77,6 +93,8 @@ export async function uploadFile(file) {
     // Do NOT set Content-Type — browser sets multipart boundary
   });
 }
+
+export const uploadDataset = uploadFile;
 
 /**
  * Extract upload_id from the upload response.
@@ -102,11 +120,74 @@ export async function runAudit(uploadId) {
   });
 }
 
+export async function startAuditAsync(payload) {
+  const uploadId = payload?.upload_id || payload?.dataset_id || payload?.job_id || null;
+  if (!uploadId) {
+    throw new Error('dataset_id or upload_id missing from audit request');
+  }
+
+  const response = await runAudit(uploadId);
+  return {
+    success: true,
+    data: {
+      job_id: uploadId,
+      ...extractData(response),
+    },
+  };
+}
+
+export function streamAudit(jobId, handlers = {}) {
+  const { onOpen, onEvent, onError } = handlers;
+  let cancelled = false;
+
+  Promise.resolve()
+    .then(() => {
+      if (cancelled) return null;
+      onOpen?.();
+      return runAudit(jobId);
+    })
+    .then((result) => {
+      if (cancelled || !result) return;
+      onEvent?.({
+        stage: 'completed',
+        progress: 100,
+        message: 'Audit complete',
+        done: true,
+        result: extractData(result) || result,
+      });
+    })
+    .catch((error) => {
+      if (cancelled) return;
+      onError?.(error);
+    });
+
+  return {
+    close() {
+      cancelled = true;
+    },
+  };
+}
+
 /**
  * POST /api/debias
  * Returns strategies with fairness_before / fairness_after.
  */
-export async function runDebias({ file, labelCol, protectedCol, privilegedGroup }) {
+export async function runDebias(payload = {}) {
+  const file = payload.file;
+  const labelCol = payload.labelCol || payload.label_column || payload.labelColumn;
+  const protectedCol = payload.protectedCol || payload.protected_column || payload.protectedColumn;
+  const privilegedGroup = payload.privilegedGroup || payload.privileged_group || '1';
+
+  if (!file) {
+    throw new Error('Debias request is missing the dataset file.');
+  }
+  if (!labelCol) {
+    throw new Error('Debias request is missing the label column.');
+  }
+  if (!protectedCol) {
+    throw new Error('Debias request is missing the protected column.');
+  }
+
   const formData = new FormData();
   formData.append('file', file, file.name || 'upload.csv');
   formData.append('label_col', labelCol);
@@ -117,6 +198,17 @@ export async function runDebias({ file, labelCol, protectedCol, privilegedGroup 
     method: 'POST',
     body: formData,
   });
+}
+
+export async function getReport(uploadId) {
+  return {
+    success: true,
+    data: {
+      upload_id: uploadId,
+      generated_at: new Date().toISOString(),
+      source: 'client-side-compatibility-layer',
+    },
+  };
 }
 
 export { API_BASE };
